@@ -53,6 +53,11 @@
     --accent-bg: rgba(37, 99, 235, 0.06);
     --accent-border: rgba(37, 99, 235, 0.22);
     --accent-glow: rgba(37, 99, 235, 0.12);
+
+    --ok: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --info: #0ea5e9;
     color-scheme: light;
   }
 }
@@ -73,6 +78,11 @@
   --accent-bg: rgba(37, 99, 235, 0.06);
   --accent-border: rgba(37, 99, 235, 0.22);
   --accent-glow: rgba(37, 99, 235, 0.12);
+
+  --ok: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
+  --info: #0ea5e9;
   color-scheme: light;
 }
 
