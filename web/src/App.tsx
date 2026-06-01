@@ -87,6 +87,7 @@ import {
   subscribeToBrowserAiStatus,
 } from "./lib/webllmProvider";
 import "./App.css";
+import { analyse } from '@ryft/sdk';
 
 const LazyReactMarkdown = lazy(() => import("react-markdown"));
 const LazyBoostMeta = lazy(() =>
@@ -1689,6 +1690,11 @@ export default function App() {
   const boost = useCallback(async () => {
     if (!input.trim()) {
       return;
+    }
+
+    const detection = analyse(input);
+    if (detection.risk !== 'clean') {
+      console.warn('[Ryft] Injection detected:', detection);
     }
 
     abortRef.current?.abort();
