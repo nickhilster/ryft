@@ -229,7 +229,7 @@ export function ApiKeyInput({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "ryfine-keys.json";
+    a.download = "ryft-keys.json";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -247,7 +247,7 @@ export function ApiKeyInput({
       ? `[System.Environment]::SetEnvironmentVariable("OLLAMA_ORIGINS","${origin}","User")\nollama serve`
       : `OLLAMA_ORIGINS="${origin}" ollama serve`;
 
-    return `# Run this on the machine hosting Ollama:\n${command}\n\n# In RyFine on the other device, use this endpoint:\n${endpoint}`;
+    return `# Run this on the machine hosting Ollama:\n${command}\n\n# In Ryft on the other device, use this endpoint:\n${endpoint}`;
   }
 
   function copyRemoteOllamaSetup() {
@@ -929,7 +929,7 @@ export function ApiKeyInput({
                   </div>
 
                   <p className="setup-hint">
-                    Run this in a terminal, then come back — RyFine will detect
+                    Run this in a terminal, then come back — Ryft will detect
                     Ollama automatically when it starts.
                   </p>
                 </div>
