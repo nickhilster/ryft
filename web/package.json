@@ -13,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ryfine/core": "*",
+    "@ryft/core": "*",
     "@anthropic-ai/sdk": "^0.99.0",
     "@mlc-ai/web-llm": "^0.2.84",
     "openai": "^6.39.0",

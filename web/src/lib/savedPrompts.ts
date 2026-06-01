@@ -1,4 +1,4 @@
-import { isAgent, isProvider, type Agent, type Provider } from '@ryfine/core';
+import { isAgent, isProvider, type Agent, type Provider } from '@ryft/core';
 
 export const SAVED_PROMPTS_STORAGE_KEY = 'ryfine_saved_prompts_v1';
 const SAVED_PROMPTS_VERSION = 1;

@@ -18,19 +18,19 @@ import {
   ryFine,
   type BoostTokenUsage,
   type RyFineRequest,
-} from "@ryfine/core";
+} from "@ryft/core";
 import {
   DEFAULT_MODEL,
   MODELS,
   PROVIDERS,
   type Provider,
-} from "@ryfine/core";
+} from "@ryft/core";
 import {
   type AppImage,
   extractPasteImage,
   formatImageSize,
   readImageFile,
-} from "@ryfine/core";
+} from "@ryft/core";
 import {
   buildFewShotExamples,
   createProject,
@@ -51,8 +51,8 @@ import {
   type RepoContextFile,
 } from "./lib/repoContext";
 import { filterFilesForGitContext } from "./lib/gitFilter";
-import { AGENTS } from "@ryfine/core";
-import type { Agent } from "@ryfine/core";
+import { AGENTS } from "@ryft/core";
+import type { Agent } from "@ryft/core";
 import type { GitHubRepo } from "./lib/githubContext";
 import {
   SAVED_PROMPTS_STORAGE_KEY,

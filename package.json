@@ -1,10 +1,10 @@
 {
-	"name": "ryfine-monorepo",
+	"name": "ryft-monorepo",
 	"private": true,
-	"description": "Browser-based prompt refinement tool.",
+	"description": "Prompt injection detection for developers building AI systems.",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/nickhilster/ryfine"
+		"url": "https://github.com/nickhilster/ryft"
 	},
 	"license": "MIT",
 	"version": "0.9.0",

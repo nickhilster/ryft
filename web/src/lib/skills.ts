@@ -1,4 +1,4 @@
-import type { Agent } from '@ryfine/core';
+import type { Agent } from '@ryft/core';
 
 export type SkillId = Agent;
 

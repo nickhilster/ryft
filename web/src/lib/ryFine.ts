@@ -1,1 +1,1 @@
-export * from '@ryfine/core/ryFine';
+export * from '@ryft/core/ryFine';

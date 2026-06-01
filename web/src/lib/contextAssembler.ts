@@ -1,4 +1,4 @@
-import type { Agent } from '@ryfine/core';
+import type { Agent } from '@ryft/core';
 import { isConfidentClassification, type ClassificationResult } from './intentClassifier.ts';
 import type { FewShotExample } from './projects.ts';
 import { getSkill, type SkillDef } from './skills.ts';
