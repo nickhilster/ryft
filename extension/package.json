@@ -1,0 +1,31 @@
+{
+  "name": "ryfine-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/build.mjs chrome",
+    "build:firefox": "node ./scripts/build.mjs firefox",
+    "pack": "node ./scripts/pack.mjs chrome",
+    "pack:firefox": "node ./scripts/pack.mjs firefox",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@ryfine/core": "*",
+    "astro": "6.4.2",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.30",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.4",
+    "jsdom": "^26.0.0",
+    "jszip": "^3.10.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.14",
+    "vitest": "^3.0.0"
+  }
+}

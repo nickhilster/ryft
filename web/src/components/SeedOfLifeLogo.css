@@ -1,0 +1,456 @@
+/* ──────────────────────────────────────────────────────────
+   Seed of Life — full animation state system
+
+   Direction carries meaning:
+     ↺ counter-clockwise  = gathering, receiving (input side)
+     ↻ clockwise          = releasing, giving back (output side)
+     radial outward       = transformation moment
+     radial inward        = collapse (error)
+   ────────────────────────────────────────────────────────── */
+
+.sol-icon {
+  overflow: visible;
+  flex-shrink: 0;
+  display: block;
+  color: var(--accent);
+  filter: drop-shadow(0 0 5px var(--accent-glow));
+  transition: filter 0.5s ease, color 0.4s ease;
+}
+
+.sol-circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: opacity;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   FORMATION  —  each circle springs from its own centre
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-form {
+  from  { opacity: 0; transform: scale(0.06); }
+  65%   { opacity: 1; transform: scale(1.08); }
+  to    { opacity: 1; transform: scale(1);    }
+}
+
+.sol-phase-forming .sol-circle {
+  animation: sol-form 500ms cubic-bezier(0.22, 1.4, 0.36, 1) both;
+  animation-delay: var(--sol-form-delay, 0ms);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   IDLE  —  barely-there counter-clockwise drift
+   Low contrast, meditative. "Waiting, alive, unhurried."
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-idle-wave {
+  0%, 100% { opacity: 0.38; }
+  20%      { opacity: 0.72; }
+  42%      { opacity: 0.38; }
+}
+
+@keyframes sol-idle-center {
+  0%, 100% { opacity: 0.42; }
+  50%      { opacity: 0.65; }
+}
+
+.sol-phase-idle .sol-center {
+  animation: sol-idle-center 3.2s ease-in-out infinite;
+}
+.sol-phase-idle .sol-outer {
+  animation: sol-idle-wave 6.4s ease-in-out infinite;
+  animation-delay: var(--sol-idle-delay, 0ms);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   THINKING  —  faster CCW wave
+   ↺ Still gathering. "Something is here. Use me."
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-think {
+  0%, 100% { opacity: 0.18; }
+  16%      { opacity: 1;    }
+  38%      { opacity: 0.18; }
+}
+
+@keyframes sol-think-center {
+  0%, 100% { opacity: 0.42; }
+  50%      { opacity: 0.72; }
+}
+
+.sol-phase-thinking .sol-center {
+  animation: sol-think-center 2.4s ease-in-out infinite;
+}
+.sol-phase-thinking .sol-outer {
+  animation: sol-think 2.4s ease-in-out infinite;
+  animation-delay: var(--sol-think-delay, 0ms);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BURST  —  radial big bang, Option B slow-fade loop
+   Centre ignites first. Outer ring ignites simultaneously
+   ~400 ms later. Everything slow-fades while centre already
+   fires the next pulse. Seamless infinite expansion.
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-burst-center {
+  0%   { opacity: 0.15; }
+  12%  { opacity: 1;    }
+  100% { opacity: 0.15; }   /* slow fade — by end, next pulse begins */
+}
+
+@keyframes sol-burst-outer {
+  0%   { opacity: 0.08; }
+  22%  { opacity: 0.95; }   /* peaks after centre */
+  100% { opacity: 0.08; }   /* slow fade in lock-step */
+}
+
+.sol-phase-burst .sol-center {
+  animation: sol-burst-center 2.0s ease-in-out infinite;
+  animation-delay: 0ms;
+}
+.sol-phase-burst .sol-outer {
+  /* all outer circles fire simultaneously — override per-ring delay */
+  animation: sol-burst-outer 2.0s ease-in-out infinite;
+  animation-delay: 320ms !important;
+}
+
+.sol-phase-burst {
+  filter: drop-shadow(0 0 9px var(--accent-glow));
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   WORKING  —  fast CLOCKWISE sweep
+   ↻ Direction reversed. "Giving back. Outputting."
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-work {
+  0%, 100% { opacity: 0.1;  stroke-width: 2.4; }
+  13%      { opacity: 1;    stroke-width: 3.4; }
+  30%      { opacity: 0.1;  stroke-width: 2.4; }
+}
+
+@keyframes sol-work-center {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1;    }
+}
+
+.sol-phase-working .sol-center {
+  animation: sol-work-center 0.7s ease-in-out infinite;
+}
+.sol-phase-working .sol-outer {
+  animation: sol-work 1.2s ease-in-out infinite;
+  animation-delay: var(--sol-work-delay, 0ms);  /* CW delays set in component */
+}
+
+.sol-phase-working {
+  filter: drop-shadow(0 0 12px var(--accent-glow));
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   DONE  —  single outward pulse then settled warm glow
+   Plays once. Centre first, outer ring follows, everything
+   settles to a warm, evenly-lit resting state.
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-done-center {
+  0%   { opacity: 0.55; }
+  18%  { opacity: 1;    }
+  100% { opacity: 0.82; }   /* holds warm */
+}
+
+@keyframes sol-done-outer {
+  0%   { opacity: 0.08; }
+  38%  { opacity: 0.92; }
+  100% { opacity: 0.72; }   /* holds warm */
+}
+
+.sol-phase-done .sol-center {
+  animation: sol-done-center 1.8s ease-out forwards;
+}
+.sol-phase-done .sol-outer {
+  animation: sol-done-outer 1.8s ease-out forwards;
+  animation-delay: 280ms !important;   /* all outer simultaneously */
+}
+
+.sol-phase-done {
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   ERROR  —  outside-in implosion
+   Outer ring dims first, then centre collapses.
+   Icon goes red. "Something went wrong."
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-error-outer {
+  0%, 100% { opacity: 0.75; }
+  45%      { opacity: 0.06; }
+}
+
+@keyframes sol-error-center {
+  0%, 55%  { opacity: 0.75; }
+  85%      { opacity: 0.06; }
+  100%     { opacity: 0.75; }
+}
+
+.sol-phase-error {
+  color: var(--danger);
+  filter: drop-shadow(0 0 8px rgba(255, 93, 93, 0.4));
+}
+.sol-phase-error .sol-outer {
+  animation: sol-error-outer 1.5s ease-in-out infinite;
+  animation-delay: 0ms !important;
+}
+.sol-phase-error .sol-center {
+  animation: sol-error-center 1.5s ease-in-out infinite;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   COMPARE  —  two streams weaving in opposite directions
+   Odd-ring circles run clockwise, even-ring run CCW.
+   Creates a visual "weighing" or "tension" in the geometry.
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes sol-compare {
+  0%, 100% { opacity: 0.18; }
+  16%      { opacity: 1;    }
+  38%      { opacity: 0.18; }
+}
+
+.sol-phase-compare .sol-center {
+  animation: sol-think-center 2.0s ease-in-out infinite;
+}
+/* CCW stream — even rings (0,2,4 by ring attribute) */
+.sol-phase-compare [data-ring="0"],
+.sol-phase-compare [data-ring="2"],
+.sol-phase-compare [data-ring="4"] {
+  animation: sol-compare 2.0s ease-in-out infinite;
+  animation-delay: var(--sol-think-delay, 0ms);
+}
+/* CW stream — odd rings (1,3,5) */
+.sol-phase-compare [data-ring="1"],
+.sol-phase-compare [data-ring="3"],
+.sol-phase-compare [data-ring="5"] {
+  animation: sol-compare 2.0s ease-in-out infinite;
+  animation-delay: var(--sol-work-delay, 0ms);
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BUTTON CONTEXT  —  icon on accent background
+   Inherits ink colour, no external glow.
+   ══════════════════════════════════════════════════════════ */
+
+.btn-boost .sol-icon,
+.btn-boost .sol-icon.sol-phase-thinking,
+.btn-boost .sol-icon.sol-phase-working,
+.btn-boost .sol-icon.sol-phase-burst {
+  color: var(--accent-ink);
+  filter: none;
+}
+
+.btn-boost:disabled .sol-icon {
+  opacity: 0.45;
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   CENTERPIECE  —  large output-pane empty state
+
+   Different animation language from the header logo:
+   ① Prime-rhythm individual circle breathing — each circle
+     has its own incommensurable period (set via --cp-period).
+     They drift in/out of phase, creating a pattern that never
+     repeats in human-observable time.
+   ② The centre breathes INVERSELY to the outer ring, creating
+     depth — the geometry "breathes" as one organism.
+   ③ Very slow full-geometry rotation (60 s/rev) for idle.
+   ══════════════════════════════════════════════════════════ */
+
+.sol-centerpiece {
+  /* Thinner strokes look more elegant at large scale */
+  transform-origin: center center;
+}
+
+.sol-centerpiece .sol-circle {
+  stroke-width: 1.8;
+}
+
+/* ── Appear / disappear transition on the wrapper ─────── */
+.output-centerpiece-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 18px;
+  padding: 40px 24px;
+  min-height: 180px;
+  animation: cp-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes cp-enter {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.centerpiece-hint {
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.4;
+  text-align: center;
+  margin: 0;
+}
+
+.centerpiece-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text);
+  opacity: 0.55;
+}
+
+.centerpiece-loading .loading-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: loading-pulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--accent-glow);
+  flex-shrink: 0;
+}
+
+/* ── Slow full-rotation for idle/thinking ──────────────── */
+@keyframes cp-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Prime-rhythm breathing keyframes ──────────────────── */
+@keyframes cp-outer {
+  0%, 100% { opacity: 0.18; }
+  50%       { opacity: 0.80; }
+}
+
+@keyframes cp-center {
+  0%, 100% { opacity: 0.68; }
+  50%       { opacity: 0.28; }   /* inversely breathes */
+}
+
+/* Idle — slow rotation + prime-rhythm breath */
+.sol-centerpiece.sol-phase-idle {
+  animation: cp-rotate 60s linear infinite;
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.sol-centerpiece.sol-phase-idle .sol-center {
+  animation: cp-center var(--cp-period, 3s) ease-in-out infinite;
+  animation-delay: var(--cp-delay, 0ms);
+}
+
+.sol-centerpiece.sol-phase-idle .sol-outer {
+  animation: cp-outer var(--cp-period, 3s) ease-in-out infinite;
+  animation-delay: var(--cp-delay, 0ms);
+}
+
+/* Thinking — same but faster (period × 0.6) via calc */
+.sol-centerpiece.sol-phase-thinking {
+  animation: cp-rotate 36s linear infinite;   /* faster rotation */
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.sol-centerpiece.sol-phase-thinking .sol-center {
+  animation: cp-center calc(var(--cp-period, 3s) * 0.6) ease-in-out infinite;
+  animation-delay: var(--cp-delay, 0ms);
+}
+
+.sol-centerpiece.sol-phase-thinking .sol-outer {
+  animation: cp-outer calc(var(--cp-period, 3s) * 0.6) ease-in-out infinite;
+  animation-delay: var(--cp-delay, 0ms);
+}
+
+/* Burst — dramatic radial, no rotation */
+@keyframes cp-burst-center {
+  0%   { opacity: 0.10; }
+  12%  { opacity: 1;    }
+  100% { opacity: 0.10; }
+}
+
+@keyframes cp-burst-outer {
+  0%   { opacity: 0.04; }
+  26%  { opacity: 0.92; }
+  100% { opacity: 0.04; }
+}
+
+.sol-centerpiece.sol-phase-burst {
+  filter: drop-shadow(0 0 20px var(--accent-glow));
+}
+
+.sol-centerpiece.sol-phase-burst .sol-center {
+  animation: cp-burst-center 2.4s ease-in-out infinite;
+  animation-delay: 0ms !important;
+}
+
+.sol-centerpiece.sol-phase-burst .sol-outer {
+  animation: cp-burst-outer 2.4s ease-in-out infinite;
+  animation-delay: 420ms !important;
+}
+
+/* Error — red outside-in collapse */
+.sol-centerpiece.sol-phase-error {
+  color: var(--danger);
+  filter: drop-shadow(0 0 14px rgba(255, 93, 93, 0.45));
+}
+
+.sol-centerpiece.sol-phase-error .sol-outer {
+  animation: sol-error-outer 1.5s ease-in-out infinite;
+  animation-delay: 0ms !important;
+}
+
+.sol-centerpiece.sol-phase-error .sol-center {
+  animation: sol-error-center 1.5s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ══════════════════════════════════════════════════════════ */
+
+@media (max-width: 720px) {
+  .output-centerpiece-wrap {
+    padding: 24px 16px;
+  }
+
+  /* SVG size is set via a prop attribute — override with CSS for mobile */
+  .output-centerpiece-wrap .sol-centerpiece {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sol-circle {
+    animation: none !important;
+    opacity: 0.82 !important;
+    transform: none !important;
+    stroke-width: 2.4 !important;
+  }
+  .sol-centerpiece {
+    animation: none !important;
+  }
+  .sol-centerpiece .sol-circle {
+    opacity: 0.65 !important;
+  }
+}

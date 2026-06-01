@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .sol { stroke: #c8f750; }
+      }
+      .sol {
+        fill: none;
+        stroke: #4c7a00;
+        stroke-width: 6.5;
+        stroke-linecap: round;
+      }
+    </style>
+  </defs>
+  <!-- Center -->
+  <circle class="sol" cx="50" cy="50" r="20"/>
+  <!-- Right -->
+  <circle class="sol" cx="70" cy="50" r="20"/>
+  <!-- Upper-right -->
+  <circle class="sol" cx="60" cy="32.68" r="20"/>
+  <!-- Upper-left -->
+  <circle class="sol" cx="40" cy="32.68" r="20"/>
+  <!-- Left -->
+  <circle class="sol" cx="30" cy="50" r="20"/>
+  <!-- Lower-left -->
+  <circle class="sol" cx="40" cy="67.32" r="20"/>
+  <!-- Lower-right -->
+  <circle class="sol" cx="60" cy="67.32" r="20"/>
+</svg>

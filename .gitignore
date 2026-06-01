@@ -1,0 +1,13 @@
+out
+node_modules
+*.vsix
+.vercel
+.output
+.wxt
+extension/.output
+extension/.wxt
+web/test-results
+docs/lighthouse\ reports/
+web/.lighthouse-edge-profile-*/
+.tmp/
+ryfine-browser-ai-report.html

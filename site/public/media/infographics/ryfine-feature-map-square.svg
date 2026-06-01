@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img" aria-labelledby="title desc">
+  <title id="title">RyFine Feature Map</title>
+  <desc id="desc">A square feature map of the RyFine interface showing the main command bar controls, prompt pane, refined output, and supporting panels.</desc>
+  <rect width="1080" height="1080" rx="46" fill="#0b0c10" />
+  <g opacity="0.15">
+    <path d="M0 135H1080" stroke="#ffffff" />
+    <path d="M0 270H1080" stroke="#ffffff" />
+    <path d="M0 405H1080" stroke="#ffffff" />
+    <path d="M0 540H1080" stroke="#ffffff" />
+    <path d="M0 675H1080" stroke="#ffffff" />
+    <path d="M0 810H1080" stroke="#ffffff" />
+    <path d="M0 945H1080" stroke="#ffffff" />
+  </g>
+  <text x="76" y="100" fill="#c8f750" font-family="Geist Mono, monospace" font-size="24" letter-spacing="3">RYFINE PRODUCT MAP</text>
+  <text x="76" y="184" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="72" font-weight="800">RyFine Feature Map</text>
+  <text x="76" y="238" fill="#b8b8c5" font-family="Hanken Grotesk, sans-serif" font-size="28">How the main controls, context layers, and output tools fit together.</text>
+
+  <rect x="182" y="314" width="716" height="530" rx="34" fill="#14141a" stroke="#ffffff" stroke-opacity="0.08" />
+  <rect x="214" y="346" width="652" height="64" rx="18" fill="#1b1b23" />
+  <text x="246" y="388" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="28" font-weight="800">RyFine</text>
+  <text x="432" y="388" fill="#8b8b99" font-family="Geist Mono, monospace" font-size="18">Rules   Skills   Context   Library   Project</text>
+
+  <rect x="214" y="438" width="286" height="332" rx="22" fill="#0d1117" stroke="#5cc8ff" stroke-opacity="0.22" />
+  <text x="242" y="478" fill="#5cc8ff" font-family="Geist Mono, monospace" font-size="20">INPUT PANE</text>
+  <text x="242" y="532" fill="#f4f4f6" font-family="Hanken Grotesk, sans-serif" font-size="30" font-weight="700">Rough prompt</text>
+  <text x="242" y="580" fill="#8b8b99" font-family="Hanken Grotesk, sans-serif" font-size="24">Paste messy instructions,</text>
+  <text x="242" y="612" fill="#8b8b99" font-family="Hanken Grotesk, sans-serif" font-size="24">attach images, then refine.</text>
+  <rect x="242" y="676" width="164" height="44" rx="22" fill="#c8f750" /><text x="274" y="705" fill="#0c1003" font-family="Geist Mono, monospace" font-size="18">RYFINE ✦</text>
+
+  <rect x="580" y="438" width="286" height="332" rx="22" fill="#0d1117" stroke="#c8f750" stroke-opacity="0.22" />
+  <text x="608" y="478" fill="#c8f750" font-family="Geist Mono, monospace" font-size="20">OUTPUT PANE</text>
+  <text x="608" y="532" fill="#f4f4f6" font-family="Hanken Grotesk, sans-serif" font-size="30" font-weight="700">Refined prompt</text>
+  <text x="608" y="580" fill="#8b8b99" font-family="Hanken Grotesk, sans-serif" font-size="24">Trace, inspect, copy,</text>
+  <text x="608" y="612" fill="#8b8b99" font-family="Hanken Grotesk, sans-serif" font-size="24">or compare models.</text>
+
+  <g font-family="Geist Mono, monospace" font-size="18">
+    <path d="M182 454C126 454 118 454 118 454V360" stroke="#5cc8ff" stroke-width="4" fill="none" />
+    <text x="70" y="346" fill="#5cc8ff">Settings</text>
+    <path d="M140 528H182" stroke="#5cc8ff" stroke-width="4" />
+    <text x="42" y="534" fill="#5cc8ff">Context</text>
+    <path d="M898 420H958V314" stroke="#c8f750" stroke-width="4" fill="none" />
+    <text x="920" y="300" fill="#c8f750">Rules</text>
+    <path d="M898 510H1010" stroke="#c8f750" stroke-width="4" />
+    <text x="932" y="502" fill="#c8f750">Skills</text>
+    <path d="M898 602H1004" stroke="#5cc8ff" stroke-width="4" />
+    <text x="930" y="594" fill="#5cc8ff">Library</text>
+    <path d="M898 694H1002" stroke="#5cc8ff" stroke-width="4" />
+    <text x="934" y="686" fill="#5cc8ff">Project</text>
+  </g>
+
+  <text x="76" y="1002" fill="#c8f750" font-family="Geist Mono, monospace" font-size="22" letter-spacing="2">Learn more at ryfine.app</text>
+</svg>

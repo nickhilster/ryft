@@ -1,0 +1,503 @@
+plan_id: pipeline-upgrade-2026-05-29
+objective: implement docs/pipeline-upgrade-plan.md end-to-end in the RyFine web app
+focus_area: app-ui-wiring
+created_at: 2026-05-29
+created_by: GitHub Copilot GPT-5.4
+status: completed
+
+tldr: |
+  - App UI wiring is centralized in web/src/App.tsx: panel state, palette commands, boost request construction, and output-pane rendering all live there.
+  - Drawer mechanics already support Phase 5 with a single mutually exclusive openPanel union, shared drawer markup, shared scrim, and reusable disclosure-trigger styles.
+  - Phase 5 must extend the request boundary from App.tsx into ryFine.ts because userSkills are not part of the current RyFineRequest shape and App currently passes only promptText, provider, model, agent, customInstructions, repoContext, image, and derived fewShotExamples.
+  - Phase 6 has a clean render slot in the single-result output pane between the existing pane header and output body; compare mode is rendered through a separate branch and is naturally excluded.
+  - Main constraints are App.tsx concentration, trace reset consistency across all clear/new-run paths, and preserving current single-vs-compare rendering behavior.
+
+research_metadata:
+  methodology: hybrid retrieval using targeted grep_search plus bounded read_file reads on the plan, App shell, current drawers, palette, output pane, CSS contracts, and request boundary in ryFine.ts
+  tools_used:
+    - memory.view
+    - read_file
+    - grep_search
+    - create_directory
+    - create_file
+  scope: focused on web/src/App.tsx, current drawer/panel components, command palette, output pane rendering, shared App.css drawer/output styles, and ryFine request wiring relevant to phases 5-6
+  confidence: high
+  coverage: 88
+
+files_analyzed:
+  - file: App.tsx
+    path: web/src/App.tsx
+    purpose: Root app shell that owns UI state, request composition, drawer routing, palette commands, and output rendering.
+    key_elements:
+      - element: openPanel state
+        type: variable
+        location: web/src/App.tsx:471
+        description: Single union state controls which drawer is open; current values are rules, context, library, settings, project, or null.
+      - element: resetTransientOutputState
+        type: function
+        location: web/src/App.tsx:671
+        description: Clears iteration-related transient output state by resetting iterations, adjustInput, and showDiff.
+      - element: executeBoostRequest calls
+        type: pattern
+        location: web/src/App.tsx:1219
+        description: Single-mode boost path builds the request object for executeBoostRequest.
+      - element: executeBoostRequest calls
+        type: pattern
+        location: web/src/App.tsx:1253
+        description: Repo comparison baseline path sends a request without repoContext.
+      - element: executeBoostRequest calls
+        type: pattern
+        location: web/src/App.tsx:1266
+        description: Repo comparison grounded path sends a request with repoContext.
+      - element: executeBoostRequest calls
+        type: pattern
+        location: web/src/App.tsx:1403
+        description: Prompt-library quick boost path builds a single-mode request from a saved prompt.
+      - element: executeBoostRequest calls
+        type: pattern
+        location: web/src/App.tsx:1452
+        description: Iteration adjust path reuses executeBoostRequest with instruction-augmented custom rules.
+      - element: clear
+        type: function
+        location: web/src/App.tsx:1313
+        description: Full workspace reset path clearing input, outputs, iterations, compare state, and mobile tab.
+      - element: paletteCommands
+        type: variable
+        location: web/src/App.tsx:1601
+        description: Flat command list consumed by CommandPalette; phase 5-6 command additions belong here.
+      - element: inputPane
+        type: variable
+        location: web/src/App.tsx:1630
+        description: Left prompt pane with footer actions and model comparison controls.
+      - element: outputPane
+        type: variable
+        location: web/src/App.tsx:1845
+        description: Right output pane; single-result branch and compare branch diverge here.
+      - element: command bar disclosure triggers
+        type: pattern
+        location: web/src/App.tsx:2102
+        description: Right-zone top bar renders Rules, Context, Library, and Project triggers using shared disclosure-trigger styling.
+      - element: library drawer
+        type: pattern
+        location: web/src/App.tsx:2163
+        description: Left drawer mounts PromptLibrary when openPanel is library.
+      - element: context drawer
+        type: pattern
+        location: web/src/App.tsx:2184
+        description: Right drawer pattern with shared header/body structure.
+      - element: rules drawer
+        type: pattern
+        location: web/src/App.tsx:2390
+        description: Minimal right drawer showing textarea-only content; closest current analogue for a simple skills panel shell.
+      - element: settings drawer
+        type: pattern
+        location: web/src/App.tsx:2410
+        description: Right drawer wrapping ApiKeyInput inside shared drawer layout.
+      - element: project drawer
+        type: pattern
+        location: web/src/App.tsx:2433
+        description: Richer right drawer using shared drawer primitives plus project-specific content.
+    language: TypeScript
+    lines: 2488
+
+  - file: App.css
+    path: web/src/App.css
+    purpose: Shared visual contracts for command bar triggers, panes, drawers, output chips, and drawer internals.
+    key_elements:
+      - element: disclosure-trigger
+        type: pattern
+        location: web/src/App.css:190
+        description: Shared trigger styling used by Rules, Context, Library, and Project buttons in the top command bar.
+      - element: trigger-badge
+        type: pattern
+        location: web/src/App.css:225
+        description: Existing count badge style suitable for a skills count indicator.
+      - element: pane-header
+        type: pattern
+        location: web/src/App.css:301
+        description: Existing output and input pane header contract; trace strip would sit immediately below this header in the output pane.
+      - element: output-area
+        type: pattern
+        location: web/src/App.css:352
+        description: Main scrollable output container currently holding compare cards or single-result content.
+      - element: adjust-bar
+        type: pattern
+        location: web/src/App.css:1055
+        description: Footer bar after output content; confirms current single-output stack order is header -> output-area -> adjust bar -> pane footer.
+      - element: panel-scrim
+        type: pattern
+        location: web/src/App.css:1253
+        description: Shared backdrop for any open drawer.
+      - element: drawer shell
+        type: pattern
+        location: web/src/App.css:1262
+        description: Shared fixed-position drawer container used by both left and right drawers.
+      - element: drawer-left
+        type: pattern
+        location: web/src/App.css:1274
+        description: Left-side slide-in behavior for the prompt library.
+      - element: drawer-right
+        type: pattern
+        location: web/src/App.css:1281
+        description: Right-side animated drawer behavior used by context, rules, settings, and projects.
+      - element: drawer-header and drawer-body
+        type: pattern
+        location: web/src/App.css:1296
+        description: Shared drawer header/body spacing and scrolling contract.
+      - element: compare-chip
+        type: pattern
+        location: web/src/App.css:874
+        description: Existing pill style reused across metrics and status chips; relevant baseline for pipeline trace chip styling.
+      - element: prompt-library
+        type: pattern
+        location: web/src/App.css:2455
+        description: Existing left-drawer panel style; useful reference for panel-level composition.
+    language: CSS
+    lines: 3071
+
+  - file: CommandPalette.tsx
+    path: web/src/components/CommandPalette.tsx
+    purpose: Searchable modal command launcher driven by a flat commands array from App.tsx.
+    key_elements:
+      - element: Command interface
+        type: type
+        location: web/src/components/CommandPalette.tsx:3
+        description: Commands support id, label, shortcut, action, and disabled only; no nested grouping or metadata.
+      - element: filteredCommands
+        type: variable
+        location: web/src/components/CommandPalette.tsx:18
+        description: Command filtering is label-substring based, so new skills and trace commands only need labels and actions.
+      - element: runCommand
+        type: function
+        location: web/src/components/CommandPalette.tsx:31
+        description: Runs command.action and then closes the modal.
+    language: TypeScript
+    lines: 88
+
+  - file: PromptLibrary.tsx
+    path: web/src/components/PromptLibrary.tsx
+    purpose: Existing full drawer panel with internal create/edit/delete flows.
+    key_elements:
+      - element: editor state
+        type: variable
+        location: web/src/components/PromptLibrary.tsx:72
+        description: Internal component-managed editor workflow shows that drawer-contained CRUD UI already fits the app architecture.
+      - element: library shell
+        type: pattern
+        location: web/src/components/PromptLibrary.tsx:165
+        description: Component renders a complete self-contained panel inside the shared drawer shell from App.tsx.
+    language: TypeScript
+    lines: 395
+
+  - file: IterationChain.tsx
+    path: web/src/components/IterationChain.tsx
+    purpose: Output-pane subcomponent for stacked follow-up refinements in single-output mode.
+    key_elements:
+      - element: iteration-chain layout
+        type: pattern
+        location: web/src/components/IterationChain.tsx:25
+        description: Appends below the main single result inside output-area.
+    language: TypeScript
+    lines: 63
+
+  - file: DiffView.tsx
+    path: web/src/components/DiffView.tsx
+    purpose: Single-result alternate rendering mode that swaps markdown output for a word diff.
+    key_elements:
+      - element: DiffView
+        type: function
+        location: web/src/components/DiffView.tsx:8
+        description: Confirms single-result rendering already branches inside output-area without changing outer pane structure.
+    language: TypeScript
+    lines: 24
+
+  - file: ryFine.ts
+    path: web/src/lib/ryFine.ts
+    purpose: Current request boundary and prompt assembly implementation.
+    key_elements:
+      - element: RyFineRequest
+        type: interface
+        location: web/src/lib/ryFine.ts:12
+        description: Request currently supports promptText, provider, apiKey, model, agent, customInstructions, repoContext, image, and fewShotExamples; no userSkills or trace callback fields exist.
+      - element: buildSystemPrompt
+        type: function
+        location: web/src/lib/ryFine.ts:126
+        description: Current system prompt is assembled from static agent strings, optional custom instructions, and optional few-shot examples.
+      - element: wrapUserMessage
+        type: function
+        location: web/src/lib/ryFine.ts:152
+        description: Current user-message wrapper conditionally injects repo_context around prompt_to_boost.
+      - element: ryFine
+        type: function
+        location: web/src/lib/ryFine.ts:482
+        description: Current public API accepts request, onChunk, and optional signal only; builds systemPrompt internally and does not expose trace data.
+    language: TypeScript
+    lines: 560
+
+  - file: pipeline-upgrade-plan.md
+    path: docs/pipeline-upgrade-plan.md
+    purpose: Specifies required phase-5 and phase-6 UI changes.
+    key_elements:
+      - element: Phase 5
+        type: section
+        location: docs/pipeline-upgrade-plan.md:772
+        description: Introduces user-defined skills, a new skills drawer, new command-bar trigger, new palette commands, and request.userSkills wiring.
+      - element: Phase 6
+        type: section
+        location: docs/pipeline-upgrade-plan.md:1038
+        description: Introduces PipelineTrace component, new App state, onTrace callback wiring, and single-mode output strip rendering.
+    language: Markdown
+    lines: 1278
+
+patterns_found:
+  - category: structure
+    pattern: single root-controller component
+    description: App.tsx concentrates state, event handlers, request assembly, drawer routing, and pane rendering instead of delegating orchestration to smaller container components.
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:430
+        snippet: "App owns provider/model/agent/input/output/drawer/palette/project state in one component."
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1601
+        snippet: "paletteCommands are declared inline in App and passed directly to CommandPalette."
+    prevalence: common
+
+  - category: structure
+    pattern: mutually exclusive drawer routing through a single union
+    description: Only one drawer panel can be open at a time because all drawer triggers and drawer renders key off the same openPanel union.
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:471
+        snippet: "const [openPanel, setOpenPanel] = useState<'rules' | 'context' | 'library' | 'settings' | 'project' | null>(null);"
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:2155
+        snippet: "Shared panel-scrim closes whichever drawer is currently open by setting openPanel(null)."
+    prevalence: common
+
+  - category: architecture
+    pattern: request assembly happens in App before ryFine call
+    description: App composes promptText, agent settings, repo context, image, and few-shot examples before calling ryFine through executeBoostRequest.
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1219
+        snippet: "Single boost path sends promptText, provider, model, agent, customInstructions, repoContext."
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1452
+        snippet: "Adjust flow reuses executeBoostRequest with customInstructions derived from the adjustment text."
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:487
+        snippet: "ryFine currently builds the system prompt internally and returns token usage only."
+    prevalence: common
+
+  - category: structure
+    pattern: single-output and compare-output are hard branched
+    description: The output pane renders compare mode and single mode via different branches, with single mode also hosting diff view, iteration chain, adjust bar, and footer.
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1845
+        snippet: "outputPane branches on outputMode === 'compare'."
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:2017
+        snippet: "Single mode renders main result and then IterationChain inside output-area."
+    prevalence: common
+
+  - category: styling
+    pattern: reusable chip and drawer contracts
+    description: The app relies on shared badge, chip, and drawer CSS classes rather than panel-specific shells.
+    examples:
+      - file: web/src/App.css
+        location: web/src/App.css:225
+        snippet: ".trigger-badge provides an existing numeric badge style for disclosure buttons."
+      - file: web/src/App.css
+        location: web/src/App.css:1262
+        snippet: ".drawer, .drawer-left, .drawer-right, .drawer-header, .drawer-body define the drawer contract."
+      - file: web/src/App.css
+        location: web/src/App.css:874
+        snippet: ".compare-chip provides an existing rounded pill visual pattern."
+    prevalence: common
+
+related_architecture:
+  components_relevant_to_domain:
+    - component: App
+      responsibility: owns global UI state and all high-level orchestration for boosting, drawers, palette, and outputs
+      location: web/src/App.tsx
+      relationship_to_domain: domain center
+    - component: CommandPalette
+      responsibility: renders modal searchable actions from a flat array supplied by App
+      location: web/src/components/CommandPalette.tsx
+      relationship_to_domain: App provides commands for phase-5 and phase-6 discoverability
+    - component: PromptLibrary
+      responsibility: existing self-contained drawer-content component with CRUD flows
+      location: web/src/components/PromptLibrary.tsx
+      relationship_to_domain: closest existing component pattern for SkillManager
+    - component: IterationChain
+      responsibility: renders follow-up adjustments under the primary single result
+      location: web/src/components/IterationChain.tsx
+      relationship_to_domain: shares the single-output area that phase 6 must preserve
+    - component: DiffView
+      responsibility: alternative single-result renderer for diff mode
+      location: web/src/components/DiffView.tsx
+      relationship_to_domain: single-result content branch underneath the proposed trace strip
+    - component: ryFine
+      responsibility: provider-facing prompt refinement function
+      location: web/src/lib/ryFine.ts
+      relationship_to_domain: request contract and trace emission boundary for phases 5-6
+  interfaces_used_by_domain:
+    - interface: Command
+      location: web/src/components/CommandPalette.tsx:3
+      usage_pattern: App builds flat command objects with id label action optional shortcut and disabled
+    - interface: BoostResult
+      location: web/src/App.tsx:158
+      usage_pattern: Shared status/result shape for single, compare, and iteration results
+    - interface: RyFineRequest
+      location: web/src/lib/ryFine.ts:12
+      usage_pattern: App builds request payloads; phase 5 requires extending this shape
+  data_flow_involving_domain: App state changes drive drawer visibility, command palette actions, and output rendering. Boost actions in App construct a request object, executeBoostRequest enriches it with apiKey/image/fewShotExamples, then calls ryFine. The returned output streams into BoostResult state, which feeds the output pane. Current flow does not persist or render pipeline trace data.
+  key_relationships_to_domain:
+    - from: web/src/App.tsx
+      to: web/src/components/CommandPalette.tsx
+      relationship: composes
+    - from: web/src/App.tsx
+      to: web/src/components/PromptLibrary.tsx
+      relationship: renders
+    - from: web/src/App.tsx
+      to: web/src/components/IterationChain.tsx
+      relationship: renders
+    - from: web/src/App.tsx
+      to: web/src/components/DiffView.tsx
+      relationship: renders
+    - from: web/src/App.tsx
+      to: web/src/lib/ryFine.ts
+      relationship: calls
+
+related_technology_stack:
+  languages_used_in_domain:
+    - TypeScript
+    - TSX
+    - CSS
+    - Markdown
+  frameworks_used_in_domain:
+    - name: React
+      usage_in_domain: function components, hooks, conditional rendering, local component state
+  libraries_used_in_domain:
+    - name: react-markdown
+      purpose_in_domain: renders single and iteration output markdown
+  external_apis_used_in_domain: []
+
+related_conventions:
+  naming_patterns_in_domain: state setters and handlers use React-style names such as setOpenPanel, handleLoadPrompt, adjustRefinement, and executeBoostRequest; drawer labels and command ids are plain, user-facing strings
+  structure_of_domain: App keeps high-level orchestration local, while drawer internals or focused visual units may live in separate components; left and right drawers both use shared shell markup and styles
+  error_handling_in_domain: async boost flows convert thrown errors into BoostResult error state; drawer/palette UI mostly relies on disabled states rather than explicit error surfaces
+  testing_in_domain: no App-specific UI tests were inspected in this slice; existing visible tests in workspace target saved prompts and repo context libraries rather than the shell
+  documentation_in_domain: implementation detail for phases 5-6 is specified directly in docs/pipeline-upgrade-plan.md
+
+related_dependencies:
+  internal:
+    - component: web/src/lib/ryFine.ts
+      relationship_to_domain: receives App-composed request payloads and would need API extension for userSkills and onTrace support
+      direction: outbound
+    - component: web/src/components/CommandPalette.tsx
+      relationship_to_domain: consumes paletteCommands from App
+      direction: outbound
+    - component: web/src/components/PromptLibrary.tsx
+      relationship_to_domain: demonstrates current drawer-content component pattern
+      direction: outbound
+    - component: web/src/lib/projects.ts and web/src/lib/projectStorage.ts
+      relationship_to_domain: provide few-shot history loading already performed inside executeBoostRequest
+      direction: outbound
+  external:
+    - name: react
+      purpose_for_domain: stateful UI rendering
+    - name: react-markdown
+      purpose_for_domain: markdown rendering inside output and iteration views
+
+risks_or_constraints:
+  - area: App.tsx concentration
+    description: phase 5 and 6 both land in App.tsx, which already owns request wiring, drawer routing, palette commands, and output rendering; this increases touch density in one file
+    impact: higher merge-conflict and regression surface inside a single root component
+  - area: reset consistency
+    description: transient-output resets are split across resetTransientOutputState, clear, handleLoadPrompt, handleBoostPrompt, boost/compare setup, and useSelectedCompareResult paths
+    impact: new trace state can become stale unless every relevant reset or mode-switch path is updated consistently
+  - area: compare-mode separation
+    description: trace UI is specified only for single mode, while compare mode uses a separate branch with separate cards and toolbar
+    impact: trace rendering or trace-toggle commands must stay gated to single mode to avoid inconsistent UI state
+  - area: request-boundary change
+    description: phase 5 requires adding userSkills to every request object and phase 6 requires a trace callback and additional trace payload data from ryFine
+    impact: app-shell work depends on coordinated request-type and function-signature updates in web/src/lib/ryFine.ts and the future pipeline modules
+  - area: drawer exclusivity
+    description: openPanel allows only one drawer at a time and the library drawer remains mounted through a left-drawer shell while right drawers are conditionally rendered
+    impact: the new skills panel must fit this exclusivity model rather than introduce parallel panel state
+
+exact_surfaces_for_phases_5_6:
+  phase_5:
+    - surface: add userSkills state
+      location: web/src/App.tsx:430-500
+      detail: new top-level App state belongs with the other persistent settings and panel-affecting state near openPanel and paletteOpen
+    - surface: extend openPanel union with skills
+      location: web/src/App.tsx:471
+      detail: this is the controlling union for drawer routing and trigger active state
+    - surface: add top-bar disclosure trigger
+      location: web/src/App.tsx:2102-2139
+      detail: Skills belongs in the existing right command-zone between Rules and Context per plan; trigger-badge styling already exists
+    - surface: add skills drawer render block
+      location: web/src/App.tsx:2183-2447
+      detail: new right drawer should follow the same drawer-header plus drawer-body contract used by context/rules/settings/project
+    - surface: add palette commands
+      location: web/src/App.tsx:1601
+      detail: open-skills and new-skill commands belong in the flat paletteCommands array
+    - surface: pass userSkills through every request creator
+      location: web/src/App.tsx:1219
+      detail: single boost path must include userSkills in the request passed to executeBoostRequest
+    - surface: pass userSkills through compare baseline and compare repo paths
+      location: web/src/App.tsx:1253
+      detail: both compare-mode request objects must carry userSkills
+    - surface: pass userSkills through prompt-library boost path
+      location: web/src/App.tsx:1403
+      detail: saved-prompt initiated boost currently builds its own single-mode request object
+    - surface: pass userSkills through adjust refinement path
+      location: web/src/App.tsx:1452
+      detail: iteration adjustments also call executeBoostRequest and therefore need the same request enrichment
+    - surface: extend request contract
+      location: web/src/lib/ryFine.ts:12
+      detail: RyFineRequest currently lacks userSkills
+  phase_6:
+    - surface: add trace state
+      location: web/src/App.tsx:430-500
+      detail: lastTrace, lastSystemPrompt, and traceExpanded fit beside single-result/output-mode state
+    - surface: reset trace in transient reset helper
+      location: web/src/App.tsx:671
+      detail: resetTransientOutputState is the existing localized reset hook for single-mode transient UI
+    - surface: reset trace in clear and other mode-switch flows
+      location: web/src/App.tsx:1313
+      detail: clear is explicit, but other output-mode transitions also clear diff or compare state and are part of the trace-staleness surface
+    - surface: capture trace in executeBoostRequest -> ryFine call
+      location: web/src/App.tsx:1120-1189
+      detail: executeBoostRequest is the sole place where App currently calls ryFine and therefore the only natural onTrace insertion point
+    - surface: extend ryFine signature and trace payload
+      location: web/src/lib/ryFine.ts:482
+      detail: current signature accepts request, onChunk, signal only and returns token usage; no trace callback path exists
+    - surface: render PipelineTrace strip
+      location: web/src/App.tsx:1845
+      detail: the plan-specified insertion point is inside outputPane between pane-header and output-area in the single-result branch
+    - surface: add trace toggle palette command
+      location: web/src/App.tsx:1601
+      detail: toggle-trace belongs in paletteCommands and must be disabled when no lastTrace exists
+    - surface: add new trace styles
+      location: web/src/App.css:301
+      detail: pipeline-trace strip visually stacks after pane-header and before output-area; chip styling can reuse existing badge language but needs new classes from the plan
+
+open_questions:
+  - question: should trace state follow the currently displayed single output or only the most recent successful single refinement?
+    context: useSelectedCompareResult can copy a compare result back into singleResult at web/src/App.tsx:1093-1100 without any current trace source associated with that adopted result
+  - question: should the planned new-skill command directly open the editor state inside SkillManager or only open the drawer?
+    context: CommandPalette actions can only call App-level handlers, while the plan notes that SkillManager handles the new form internally
+  - question: should prompt-library boosts and adjust refinements both surface pipeline trace exactly the same way as a root boost?
+    context: both flows call executeBoostRequest today, but the plan language describes the trace after each successful refinement and could include all single-mode runs
+
+gaps:
+  - area: future pipeline module definitions
+    description: phase-5 and phase-6 implementation details for UserSkill, PipelineTrace, contextAssembler, and PipelineTrace component props are specified in the plan but those modules were not inspected here because the current request focused on existing App/UI wiring
+    impact: exact field-level typings beyond the plan remain outside this report
+  - area: UI tests for shell behavior
+    description: no focused App shell or component tests were inspected in this research slice
+    impact: this report identifies implementation surfaces but not existing automated coverage for drawer/palette/trace regressions

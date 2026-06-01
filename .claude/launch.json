@@ -1,0 +1,1 @@
+{"version":"0.0.1","configurations":[{"name":"ryfine-web","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"cwd":"web","port":5173,"autoPort":true},{"name":"ryfine-site","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"cwd":"site","port":4321}]}

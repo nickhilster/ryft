@@ -1,0 +1,2476 @@
+---
+const title = "RyFine — Sharpen every prompt.";
+const description =
+  "A local-first prompt refinement tool. Drop in your raw prompt, pick a provider, and get back a sharper version — using the model and API key you own.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='50' cy='50' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='70' cy='50' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='60' cy='32.68' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='40' cy='32.68' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='30' cy='50' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='40' cy='67.32' r='20'/%3E%3Ccircle fill='none' stroke='%234c7a00' stroke-width='6.5' cx='60' cy='67.32' r='20'/%3E%3C/svg%3E" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+
+    <!-- ══ Navigation ══════════════════════════════════════════ -->
+    <nav class="nav">
+      <a href="/" class="nav-logo" aria-label="RyFine home">
+        <svg class="logo-sol" width="26" height="26" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="sol-c" cx="50"    cy="50"    r="20"/>
+          <circle class="sol-c" cx="70"    cy="50"    r="20"/>
+          <circle class="sol-c" cx="60"    cy="32.68" r="20"/>
+          <circle class="sol-c" cx="40"    cy="32.68" r="20"/>
+          <circle class="sol-c" cx="30"    cy="50"    r="20"/>
+          <circle class="sol-c" cx="40"    cy="67.32" r="20"/>
+          <circle class="sol-c" cx="60"    cy="67.32" r="20"/>
+        </svg>
+        <span class="logo-word">RyFine</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how-it-works" class="nav-link">How it works</a>
+        <a href="#safety" class="nav-link">Data &amp; Safety</a>
+        <a href="#features" class="nav-link">Features</a>
+      </div>
+      <a href="#get-started" class="btn-nav-cta">
+        Get started <span aria-hidden="true">✦</span>
+      </a>
+    </nav>
+
+    <!-- ══ Hero ════════════════════════════════════════════════ -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          <span>Prompt refinement for AI-native workflows</span>
+        </div>
+
+        <h1 id="hero-heading" class="hero-h1">
+          Sharpen every&nbsp;prompt.
+        </h1>
+        <p class="hero-sub">
+          RyFine takes your raw prompt and returns a refined, professional-grade version —
+          powered by any AI provider you choose, with your keys, on your terms.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://ryfine.app" class="btn-boost">
+            Open RyFine <span aria-hidden="true">✦</span>
+          </a>
+          <a href="/guides" class="btn-ghost-lg">
+            Browse guides
+          </a>
+        </div>
+      </div>
+
+      <!-- Split-pane demo visual -->
+      <div class="hero-demo" aria-label="Product preview: raw prompt transformed to refined prompt">
+        <div class="demo-shell">
+          <div class="demo-bar" aria-hidden="true">
+            <span class="demo-dot red"></span>
+            <span class="demo-dot yellow"></span>
+            <span class="demo-dot green"></span>
+            <span class="demo-title">RyFine</span>
+          </div>
+          <div class="demo-panes">
+            <div class="demo-pane">
+              <div class="demo-pane-label">Your prompt</div>
+              <div class="demo-pane-content raw">
+                <span class="cursor-blink" aria-hidden="true">|</span>
+                write a function that sorts a list and removes duplicates and also handles null values and returns the result
+              </div>
+            </div>
+            <div class="demo-divider" aria-hidden="true">
+              <div class="demo-conduit"></div>
+            </div>
+            <div class="demo-pane">
+              <div class="demo-pane-label refined-label">Refined prompt</div>
+              <div class="demo-pane-content refined">
+                Write a <span class="hl">type-safe</span> utility function that:
+                <ol>
+                  <li>Accepts an array of values (including <span class="hl">null</span>)</li>
+                  <li>Filters out null and undefined entries</li>
+                  <li>Deduplicates remaining items using a <span class="hl">Set</span></li>
+                  <li>Returns a sorted copy in ascending order</li>
+                </ol>
+                Include <span class="hl">TypeScript generics</span>, a brief docstring, and a usage example.
+              </div>
+            </div>
+          </div>
+          <div class="demo-footer" aria-hidden="true">
+            <span class="demo-chip green-chip">
+              <span class="demo-dot-sm"></span> Ollama · llama3.2
+            </span>
+            <span class="demo-chip">~320 tokens</span>
+            <span class="demo-chip">1.4 s</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ Provider strip ══════════════════════════════════════ -->
+    <section class="providers-strip" aria-label="Supported AI providers">
+      <p class="strip-label">Works with</p>
+      <ul class="provider-list" role="list">
+        <li class="provider-pill free-pill browser-ai-pill" title="No API key — runs in your browser with WebGPU">Browser AI <span class="tier-dot free-dot" aria-label="free — no key"></span></li>
+        <li class="provider-pill free-pill" title="Free tier — local">Ollama <span class="tier-dot free-dot" aria-label="free"></span></li>
+        <li class="provider-pill free-pill" title="Free tier">OpenRouter <span class="tier-dot free-dot" aria-label="free"></span></li>
+        <li class="provider-pill free-pill" title="Free tier">Gemini <span class="tier-dot free-dot" aria-label="free"></span></li>
+        <li class="provider-pill free-pill" title="Free tier">Groq <span class="tier-dot free-dot" aria-label="free"></span></li>
+        <li class="provider-pill paid-pill" title="Paid API">Anthropic <span class="tier-dot paid-dot" aria-label="paid"></span></li>
+        <li class="provider-pill paid-pill" title="Paid API">OpenAI <span class="tier-dot paid-dot" aria-label="paid"></span></li>
+        <li class="provider-pill paid-pill" title="Paid API">DeepSeek <span class="tier-dot paid-dot" aria-label="paid"></span></li>
+      </ul>
+      <p class="strip-note">
+        <span class="legend-dot free-dot" aria-hidden="true"></span> free tier available &nbsp;·&nbsp;
+        <span class="legend-dot paid-dot" aria-hidden="true"></span> paid API
+      </p>
+    </section>
+
+    <!-- ══ Why RyFine ═══════════════════════════════════════════ -->
+    <section class="section why-section" id="why-ryfine" aria-labelledby="why-heading">
+      <div class="section-header">
+        <span class="section-eyebrow">Your workflow, upgraded</span>
+        <h2 id="why-heading">They're already powerful.<br/>Your prompts should match.</h2>
+        <p class="section-sub">
+          Claude, ChatGPT, Cursor, Gemini — each one ships with agents, skills, and deep
+          capabilities. RyFine doesn't compete with any of them. It's the step that happens
+          <em>before</em>: turning your rough idea into the precise, structured input those
+          tools perform best on.
+        </p>
+      </div>
+
+      <!-- ── Flow diagram ──────────────────────────────────────── -->
+      <figure class="why-flow" aria-label="RyFine sits between your rough idea and your AI tools">
+        <!-- Input node -->
+        <div class="why-node why-node-input">
+          <p class="why-node-label">Your rough idea</p>
+          <div class="why-prompt-snap">
+            <span class="cursor-blink" aria-hidden="true">|</span>
+            make a dashboard for<br/>user metrics
+          </div>
+        </div>
+
+        <!-- Left connector -->
+        <div class="why-conn" aria-hidden="true">
+          <div class="why-conn-track">
+            <div class="why-conn-pulse"></div>
+          </div>
+          <span class="why-conn-label">raw</span>
+        </div>
+
+        <!-- RyFine node -->
+        <div class="why-node why-node-rf" aria-label="RyFine sharpens the prompt">
+          <div class="why-rf-glow" aria-hidden="true"></div>
+          <svg class="why-rf-logo" width="32" height="32" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="sol-c" cx="50"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="70"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="60"    cy="32.68" r="20"/>
+            <circle class="sol-c" cx="40"    cy="32.68" r="20"/>
+            <circle class="sol-c" cx="30"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="40"    cy="67.32" r="20"/>
+            <circle class="sol-c" cx="60"    cy="67.32" r="20"/>
+          </svg>
+          <p class="why-rf-name">RyFine <span aria-hidden="true">✦</span></p>
+          <p class="why-rf-sub">sharpens your input</p>
+        </div>
+
+        <!-- Right connector -->
+        <div class="why-conn why-conn-right" aria-hidden="true">
+          <div class="why-conn-track">
+            <div class="why-conn-pulse"></div>
+          </div>
+          <span class="why-conn-label">refined</span>
+        </div>
+
+        <!-- Tools node -->
+        <div class="why-node why-node-tools">
+          <p class="why-node-label">Paste into any tool</p>
+          <ul class="why-tools-list" role="list">
+            <li class="why-tool">Claude</li>
+            <li class="why-tool">ChatGPT</li>
+            <li class="why-tool">Cursor</li>
+            <li class="why-tool">Gemini</li>
+            <li class="why-tool">Copilot</li>
+            <li class="why-tool why-tool-muted">your own API ···</li>
+          </ul>
+        </div>
+
+        <figcaption class="why-flow-caption">
+          RyFine refines your prompt once — then you paste it wherever you already work.
+        </figcaption>
+      </figure>
+
+      <!-- ── Propositions ──────────────────────────────────────── -->
+      <ul class="why-props" role="list">
+        <li class="why-prop">
+          <div class="why-prop-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="11" cy="11" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="11" cy="11" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>They handle your task. We handle your input.</h3>
+          <p>
+            Claude, ChatGPT, and Cursor are exceptional at acting on instructions.
+            RyFine specialises in making those instructions worth acting on — turning
+            vague intent into a prompt your tools can execute precisely.
+          </p>
+        </li>
+
+        <li class="why-prop why-prop-accent">
+          <div class="why-prop-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <path d="M2 11l9 4.5L20 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 7.5L11 3l9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 14.5l9 4.5 9-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Their agents need a clear brief.</h3>
+          <p>
+            Every built-in agent — coding assistant, writing helper, research tool —
+            returns better results when the prompt is specific, structured, and
+            unambiguous. That's exactly what one RyFine pass produces, every time.
+          </p>
+        </li>
+
+        <li class="why-prop">
+          <div class="why-prop-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="7" y="2" width="11" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="4" y="7" width="11" height="13" rx="2" stroke="currentColor" stroke-width="1.5" fill="var(--surface)"/>
+              <path d="M7 12h5M7 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Refine once. Paste anywhere.</h3>
+          <p>
+            One polished prompt travels everywhere — Claude's Projects, ChatGPT canvas,
+            Cursor's Composer, or your own API calls. No lock-in, no new interface.
+            Just a better starting point, wherever you already work.
+          </p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ══ How it works ════════════════════════════════════════ -->
+    <section class="section" id="how-it-works" aria-labelledby="how-heading">
+      <div class="section-header">
+        <span class="section-eyebrow">Under the hood</span>
+        <h2 id="how-heading">What RyFine actually does</h2>
+        <p class="section-sub">
+          No magic — just a well-crafted system prompt and your preferred model.
+          Here's the full chain.
+        </p>
+      </div>
+
+      <ol class="flow-steps" aria-label="How RyFine works">
+        <li class="flow-step">
+          <div class="step-num" aria-hidden="true">01</div>
+          <div class="step-body">
+            <h3>You write a raw prompt</h3>
+            <p>
+              Type or paste any instruction — vague, verbose, or half-formed.
+              Optionally attach <strong>repo context files</strong> to ground
+              the refinement in your actual codebase.
+            </p>
+            <div class="step-tag">
+              <span class="mono-tag">prompt + optional repo context</span>
+            </div>
+          </div>
+          <div class="step-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <rect x="4" y="6" width="24" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M9 12h14M9 16h10M9 20h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="flow-connector" aria-hidden="true">
+          <div class="connector-line"></div>
+          <span class="connector-label">sent to your provider</span>
+        </li>
+
+        <li class="flow-step">
+          <div class="step-num" aria-hidden="true">02</div>
+          <div class="step-body">
+            <h3>RyFine assembles a domain-aware system prompt</h3>
+            <p>
+              RyFine auto-detects your intent — coding, content, data, research,
+              design — and applies a matching expert lens. Custom rules, few-shot
+              examples from your project history, and repo context are layered
+              into the same call. The model is told to <strong>rewrite the prompt,
+              not answer it</strong>.
+            </p>
+            <div class="step-code-block" aria-label="Example system prompt pipeline">
+              <code>
+                intent → Coding (high confidence)<br/>
+                lens   → types · edge cases · error handling<br/>
+                +rules · +3 project examples · +repo context
+              </code>
+            </div>
+          </div>
+          <div class="step-icon accent-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M16 10v6l4 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="flow-connector" aria-hidden="true">
+          <div class="connector-line"></div>
+          <span class="connector-label">streamed back token by token</span>
+        </li>
+
+        <li class="flow-step">
+          <div class="step-num" aria-hidden="true">03</div>
+          <div class="step-body">
+            <h3>Refined prompt streams into the output pane</h3>
+            <p>
+              The response streams live into the output pane as tokens arrive.
+              RyFine detects whether the model <em>refined</em> the prompt or
+              accidentally <em>answered</em> it, and warns you if so.
+              Then copy and paste into any AI tool.
+            </p>
+            <div class="step-tag">
+              <span class="mono-tag">→ copy into Claude, ChatGPT, Cursor, etc.</span>
+            </div>
+          </div>
+          <div class="step-icon ok-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+              <path d="M8 16l6 6 10-12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </li>
+      </ol>
+
+      <!-- Token budget visual -->
+      <div class="budget-card" aria-label="Token budget breakdown">
+        <div class="budget-header">
+          <span class="budget-title">Estimated request size</span>
+          <span class="budget-chip safe-chip" aria-label="safe token usage">~3,200 tokens</span>
+        </div>
+        <div class="budget-track" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100" aria-label="42% of recommended token budget">
+          <div class="budget-fill safe-fill" style="width: 42%"></div>
+        </div>
+        <div class="budget-breakdown">
+          <span>Prompt 480 chars</span>
+          <span>Rules 120 chars</span>
+          <span>Repo context 11,800 chars</span>
+          <span>Target ~16,000 tokens</span>
+        </div>
+        <p class="budget-note">
+          RyFine tracks your request size in real time and warns when you're approaching the model's comfortable range.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══ Data & Safety ═══════════════════════════════════════ -->
+    <section class="section alt-section" id="safety" aria-labelledby="safety-heading">
+      <div class="section-header">
+        <span class="section-eyebrow">Data &amp; Safety</span>
+        <h2 id="safety-heading">Your keys. Your machine. Your data.</h2>
+        <p class="section-sub">
+          RyFine is designed from the ground up to keep your credentials and
+          prompts under your control. Zero middleman.
+        </p>
+      </div>
+
+      <ul class="safety-grid" role="list">
+        <li class="safety-card">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="6" y="12" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 12V9a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="14" cy="18" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Keys stay in <code>localStorage</code></h3>
+          <p>
+            API keys are stored in your browser's <code>localStorage</code> only —
+            never transmitted to RyFine's servers or logged anywhere.
+          </p>
+        </li>
+
+        <li class="safety-card">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M14 4L5 9v6c0 5 4 9 9 10 5-1 9-5 9-10V9l-9-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <path d="M10 14l2.5 2.5L18 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>No RyFine server in the chain</h3>
+          <p>
+            Your browser talks directly to the AI provider's API.
+            RyFine has no backend that sees your prompts, responses, or keys.
+          </p>
+        </li>
+
+        <li class="safety-card accent-safety">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="4" y="4" width="20" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M9 14h10M14 9v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Two zero-key paths</h3>
+          <p>
+            <strong>Ollama</strong> runs models on your own hardware — not a byte leaves your machine.
+            <strong>Browser AI</strong> runs a small model directly in your browser tab via WebGPU —
+            no install, no key, no server.
+          </p>
+          <span class="safety-tag">No API key required</span>
+        </li>
+
+        <li class="safety-card">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 14h4l2-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Open source &amp; auditable</h3>
+          <p>
+            The full source is on GitHub. Read exactly what the system prompt
+            says, verify the API call code, and fork it if you want.
+          </p>
+        </li>
+
+        <li class="safety-card">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M7 20V10l7-6 7 6v10" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <rect x="11" y="15" width="6" height="5" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <h3>Repo context never persisted</h3>
+          <p>
+            Uploaded source files are indexed in <code>IndexedDB</code> locally
+            for convenience. They never leave your browser or touch any cloud storage.
+          </p>
+        </li>
+
+        <li class="safety-card">
+          <div class="safety-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M5 14h4l3 6 4-12 3 6h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Real-time token budget</h3>
+          <p>
+            Before you hit Refine, RyFine shows an estimated token count so you
+            can avoid surprise overage costs on paid providers.
+          </p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ══ Features ════════════════════════════════════════════ -->
+    <section class="section" id="features" aria-labelledby="features-heading">
+      <div class="section-header">
+        <span class="section-eyebrow">Features</span>
+        <h2 id="features-heading">Everything you need to refine faster</h2>
+        <p class="section-sub">
+          Built for developers, researchers, and anyone who talks to AI every day.
+        </p>
+      </div>
+
+      <ul class="features-grid" role="list">
+        <li class="feature-card wide-card">
+          <div class="feature-card-inner">
+            <div class="feature-meta">
+              <span class="feature-eyebrow">Codebase grounding</span>
+              <h3>Repo context</h3>
+              <p>
+                Upload files, a whole project folder, or connect a local Git
+                repository. RyFine sends selected files as grounding context so
+                the model understands your naming conventions, types, and patterns.
+              </p>
+              <ul class="feature-bullets">
+                <li>Upload files or entire folders</li>
+                <li>Connect local Git repos — node_modules and .gitignore patterns auto-excluded</li>
+                <li>Toggle individual files in / out before each refinement</li>
+              </ul>
+            </div>
+            <div class="feature-visual context-visual" aria-hidden="true">
+              <div class="context-file included">
+                <span class="file-check">✓</span>
+                <span class="mono-sm">src/lib/providers.ts</span>
+                <span class="file-size">4.2 KB</span>
+              </div>
+              <div class="context-file included">
+                <span class="file-check">✓</span>
+                <span class="mono-sm">src/lib/ryFine.ts</span>
+                <span class="file-size">3.8 KB</span>
+              </div>
+              <div class="context-file">
+                <span class="file-uncheck">–</span>
+                <span class="mono-sm">README.md</span>
+                <span class="file-size">1.1 KB</span>
+              </div>
+              <div class="context-summary">
+                <span class="summary-chip">2 of 3 included · 8,000 chars selected</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Side by side</span>
+          <h3>A/B model comparison</h3>
+          <p>
+            Run two providers or models in parallel. Results stream
+            simultaneously so you can pick the version you prefer.
+          </p>
+          <div class="ab-visual" aria-hidden="true">
+            <div class="ab-col">
+              <span class="ab-label">Model A</span>
+              <div class="ab-bar" style="height: 48px; opacity: 0.7"></div>
+              <div class="ab-bar" style="height: 32px; opacity: 0.5"></div>
+            </div>
+            <div class="ab-vs">vs</div>
+            <div class="ab-col">
+              <span class="ab-label selected-label">Model B ✓</span>
+              <div class="ab-bar selected-bar" style="height: 58px"></div>
+              <div class="ab-bar selected-bar" style="height: 36px; opacity: 0.7"></div>
+            </div>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Few-shot learning</span>
+          <h3>Project memory</h3>
+          <p>
+            Group prompts into a project. RyFine archives every refinement and
+            injects recent input/output pairs as few-shot examples, so the model
+            learns your preferred output style over time.
+          </p>
+          <div class="memory-visual" aria-hidden="true">
+            <div class="memory-entry">
+              <span class="memory-label">Example 1</span>
+              <span class="memory-arrow">→</span>
+              <span class="memory-chip">output style A</span>
+            </div>
+            <div class="memory-entry">
+              <span class="memory-label">Example 2</span>
+              <span class="memory-arrow">→</span>
+              <span class="memory-chip">output style A</span>
+            </div>
+            <div class="memory-entry active-entry">
+              <span class="memory-label">Your prompt</span>
+              <span class="memory-arrow accent-arrow">→</span>
+              <span class="memory-chip accent-chip">refined ✦</span>
+            </div>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Reuse &amp; remix</span>
+          <h3>Prompt library</h3>
+          <p>
+            Save prompts as reusable templates with <code>&#123;&#123; variable &#125;&#125;</code>
+            slots. Organize by tag, search instantly, or fire a boost directly
+            from the library.
+          </p>
+          <div class="library-visual" aria-hidden="true">
+            <div class="lib-card">
+              <span class="lib-title">Code review checklist</span>
+              <div class="lib-tags">
+                <span class="lib-tag">engineering</span>
+                <span class="lib-tag">review</span>
+              </div>
+            </div>
+            <div class="lib-card">
+              <span class="lib-title">Blog post outline</span>
+              <div class="lib-tags">
+                <span class="lib-tag">writing</span>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Specialised modes</span>
+          <h3>Agent selection</h3>
+          <p>
+            Seven domain experts: <strong>Coding</strong>, Content, Data, Research, Design, Planning, and General —
+            each with a purpose-built lens. In <strong>Auto</strong> mode, RyFine classifies
+            your intent on every keystroke and picks the right agent before you even click Refine.
+          </p>
+          <div class="agent-pills-visual" aria-hidden="true">
+            <span class="agent-pill active-agent">Auto</span>
+            <span class="agent-pill">Coding</span>
+            <span class="agent-pill">Content</span>
+            <span class="agent-pill">Data</span>
+            <span class="agent-pill">Research</span>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Progressive improvement</span>
+          <h3>Iterative refinement</h3>
+          <p>
+            After the first result, type a follow-up — "make it shorter",
+            "add TypeScript types", "more formal" — and RyFine refines the
+            refinement. Chain up to 10 passes while keeping your original intact.
+          </p>
+          <div class="adjust-visual" aria-hidden="true">
+            <div class="adjust-line">
+              <span class="adjust-badge">v1</span>
+              <span class="adjust-text">Write a function that sorts a list…</span>
+            </div>
+            <div class="adjust-arrow">↓ <em>add TypeScript generics</em></div>
+            <div class="adjust-line active-adjust">
+              <span class="adjust-badge accent-adjust-badge">v2</span>
+              <span class="adjust-text">Write a type-safe utility…</span>
+            </div>
+          </div>
+        </li>
+
+        <li class="feature-card">
+          <span class="feature-eyebrow">Vision support</span>
+          <h3>Image input</h3>
+          <p>
+            Paste or attach an image alongside your prompt. RyFine sends the
+            image to vision-capable providers so you can refine prompts that
+            reference screenshots, diagrams, or designs.
+          </p>
+          <div class="image-pill-visual" aria-hidden="true">
+            <div class="img-thumb-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                <path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="img-meta-sm">
+              <span class="mono-sm">screenshot.png</span>
+              <span class="size-sm">248 KB</span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ══ Get started ═════════════════════════════════════════ -->
+    <section class="cta-section" id="get-started" aria-labelledby="cta-heading">
+      <div class="cta-glow" aria-hidden="true"></div>
+      <div class="cta-content">
+        <h2 id="cta-heading">Ready to refine?</h2>
+        <p>
+          No account. No cloud backend. Open RyFine, set a provider,
+          and your first refined prompt is seconds away.
+        </p>
+        <div class="cta-steps">
+          <div class="cta-step">
+            <span class="cta-num">1</span>
+            <span>Open the app</span>
+          </div>
+          <div class="cta-divider" aria-hidden="true">→</div>
+          <div class="cta-step">
+            <span class="cta-num">2</span>
+            <span>Pick a provider &amp; model</span>
+          </div>
+          <div class="cta-divider" aria-hidden="true">→</div>
+          <div class="cta-step">
+            <span class="cta-num">3</span>
+            <span>Hit <strong>RyFine ✦</strong></span>
+          </div>
+        </div>
+        <a href="https://ryfine.app" class="btn-boost large-boost">
+          Open RyFine <span aria-hidden="true">✦</span>
+        </a>
+        <p class="cta-note">
+          Runs locally. Your API keys never leave your browser. Need a walkthrough? <a href="/guides">Browse the guides and tutorial scripts</a>.
+        </p>
+      </div>
+    </section>
+
+    <!-- ══ Footer ══════════════════════════════════════════════ -->
+    <footer class="site-footer" role="contentinfo">
+      <div class="footer-inner">
+        <a href="/" class="footer-logo" aria-label="RyFine home">
+          <svg class="logo-sol" width="20" height="20" viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="sol-c" cx="50"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="70"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="60"    cy="32.68" r="20"/>
+            <circle class="sol-c" cx="40"    cy="32.68" r="20"/>
+            <circle class="sol-c" cx="30"    cy="50"    r="20"/>
+            <circle class="sol-c" cx="40"    cy="67.32" r="20"/>
+            <circle class="sol-c" cx="60"    cy="67.32" r="20"/>
+          </svg>
+          RyFine
+        </a>
+        <nav class="footer-links" aria-label="Footer navigation">
+          <a href="#how-it-works">How it works</a>
+          <a href="#safety">Data &amp; Safety</a>
+          <a href="#features">Features</a>
+        </nav>
+        <p class="footer-note">
+          Local-first. Open source. Your data stays yours.
+        </p>
+      </div>
+    </footer>
+
+  </body>
+</html>
+
+<style>
+  /* ══ Reset & base ═════════════════════════════════════════════════════════ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0a0a0c;
+    --surface:     #131319;
+    --surface-2:   #1b1b23;
+    --border:      #26262f;
+    --border-strong: #383844;
+    --text:        #8b8b99;
+    --text-h:      #f4f4f6;
+    --code-bg:     #15151b;
+
+    --accent:        #c8f750;
+    --accent-soft:   #d9ff7a;
+    --accent-ink:    #0c1003;
+    --accent-bg:     rgba(200, 247, 80, 0.10);
+    --accent-border: rgba(200, 247, 80, 0.38);
+    --accent-glow:   rgba(200, 247, 80, 0.45);
+
+    --ok:    #46d98a;
+    --warn:  #f5b73c;
+    --danger:#ff5d5d;
+    --info:  #5cc8ff;
+
+    --display: 'Bricolage Grotesque', system-ui, sans-serif;
+    --sans:    'Hanken Grotesk', system-ui, 'Segoe UI', sans-serif;
+    --mono:    'Geist Mono', 'Cascadia Code', Consolas, ui-monospace, monospace;
+
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--display);
+    font-weight: 700;
+    color: var(--text-h);
+    line-height: 1.15;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  ol, ul { list-style: none; }
+  code { font-family: var(--mono); }
+
+  /* ══ Page-level background texture ═══════════════════════════════════════ */
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    /* Technical grid */
+    background-image:
+      linear-gradient(transparent 0, transparent calc(100% - 1px), rgba(38,38,47,0.6) 100%),
+      linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(38,38,47,0.6) 100%);
+    background-size: 72px 72px;
+    position: relative;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.032;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ══ Navigation ═══════════════════════════════════════════════════════════ */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 0 32px;
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--bg) 80%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--text-h);
+    letter-spacing: -0.3px;
+    margin-right: auto;
+  }
+
+  .logo-sol {
+    overflow: visible;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 5px var(--accent-glow));
+  }
+
+  .sol-c {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 6.5;
+    animation: sol-breathe 3.8s ease-in-out infinite;
+  }
+
+  @keyframes sol-breathe {
+    0%, 100% { opacity: 0.68; }
+    50%       { opacity: 1; }
+  }
+
+  .logo-word { color: var(--text-h); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    border-radius: 8px;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .nav-link:hover {
+    color: var(--text-h);
+    background: var(--surface-2);
+  }
+
+  .btn-nav-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--display);
+    border-radius: 9px;
+    border: 1px solid var(--accent-border);
+    background: var(--accent);
+    color: var(--accent-ink);
+    transition: box-shadow 0.2s;
+  }
+
+  .btn-nav-cta:hover {
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  /* ══ Hero ══════════════════════════════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 48px;
+    padding: 100px 80px 100px;
+    min-height: calc(100vh - 60px);
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(80% 60% at 20% -5%, rgba(200,247,80,0.09) 0%, transparent 60%),
+      radial-gradient(60% 60% at 80% 110%, rgba(92,200,255,0.05) 0%, transparent 60%);
+  }
+
+  .hero-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 1;
+    animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--accent-border);
+    border-radius: 999px;
+    background: var(--accent-bg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    width: fit-content;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .hero-h1 {
+    font-size: clamp(42px, 5vw, 68px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    color: var(--text-h);
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--text);
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-boost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid var(--accent-border);
+    background: var(--accent);
+    color: var(--accent-ink);
+    cursor: pointer;
+    box-shadow: 0 8px 28px rgba(200,247,80,0.18);
+    transition: box-shadow 0.2s, transform 0.1s;
+  }
+
+  .btn-boost:hover {
+    box-shadow: 0 0 32px var(--accent-glow), 0 12px 36px rgba(200,247,80,0.28);
+    transform: translateY(-1px);
+  }
+
+  .btn-boost.large-boost {
+    font-size: 18px;
+    padding: 16px 36px;
+  }
+
+  .btn-ghost-lg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: transparent;
+    color: var(--text);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .btn-ghost-lg:hover {
+    background: var(--surface-2);
+    color: var(--text-h);
+    border-color: var(--border-strong);
+  }
+
+  /* ── Demo shell ────────────────────────────────────────────── */
+  .hero-demo {
+    position: relative;
+    z-index: 1;
+    animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.12s both;
+  }
+
+  .demo-shell {
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow:
+      0 0 0 1px rgba(200,247,80,0.06),
+      0 40px 80px rgba(0,0,0,0.55),
+      inset 0 1px 0 rgba(255,255,255,0.03);
+    overflow: hidden;
+  }
+
+  .demo-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .demo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .demo-dot.red    { background: #ff5f57; }
+  .demo-dot.yellow { background: #ffbd2e; }
+  .demo-dot.green  { background: #28c840; }
+
+  .demo-title {
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-left: 8px;
+    letter-spacing: 0.2px;
+  }
+
+  .demo-panes {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+  }
+
+  .demo-pane {
+    padding: 16px 18px;
+    min-height: 160px;
+  }
+
+  .demo-pane-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text);
+    opacity: 0.55;
+    margin-bottom: 10px;
+  }
+
+  .refined-label { color: var(--accent); opacity: 0.85; }
+
+  .demo-pane-content {
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-h);
+    font-family: var(--mono);
+  }
+
+  .demo-pane-content.raw {
+    color: var(--text);
+    font-style: italic;
+  }
+
+  .demo-pane-content.refined {
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+
+  .demo-pane-content ol {
+    margin: 8px 0 0 16px;
+    list-style: decimal;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .demo-pane-content ol li {
+    font-size: 12px;
+    color: var(--text);
+  }
+
+  .hl {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .cursor-blink {
+    animation: blink 1.1s step-end infinite;
+    color: var(--accent);
+  }
+
+  .demo-divider {
+    background: var(--border);
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .demo-conduit {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, var(--accent) 50%, transparent 100%);
+    background-size: 100% 200%;
+    box-shadow: 0 0 10px var(--accent-glow);
+    animation: conduit 1.8s linear infinite;
+  }
+
+  .demo-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .demo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .green-chip {
+    border-color: rgba(70,217,138,0.3);
+    background: rgba(70,217,138,0.08);
+    color: var(--ok);
+  }
+
+  .demo-dot-sm {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--ok);
+    display: inline-block;
+  }
+
+  /* ══ Provider strip ═══════════════════════════════════════════════════════ */
+  .providers-strip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 32px 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+  }
+
+  .strip-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text);
+    opacity: 0.55;
+  }
+
+  .provider-list {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .provider-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface-2);
+  }
+
+  .free-pill { border-color: rgba(70,217,138,0.25); color: var(--text-h); }
+  .paid-pill { border-color: rgba(92,200,255,0.20); color: var(--text); }
+
+  .tier-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .free-dot { background: var(--ok); }
+  .paid-dot { background: var(--info); }
+
+  .strip-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text);
+    opacity: 0.6;
+  }
+
+  .legend-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  /* ══ Section base ═════════════════════════════════════════════════════════ */
+  .section {
+    padding: 96px 80px;
+    position: relative;
+  }
+
+  .alt-section {
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 64px;
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    padding: 4px 10px;
+    border: 1px solid var(--accent-border);
+    border-radius: 999px;
+    background: var(--accent-bg);
+  }
+
+  .section-header h2 {
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: -0.8px;
+  }
+
+  .section-sub {
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  /* ══ Flow steps (how it works) ════════════════════════════════════════════ */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 760px;
+    margin: 0 auto 48px;
+  }
+
+  .flow-step {
+    display: grid;
+    grid-template-columns: 48px 1fr 64px;
+    gap: 24px;
+    align-items: start;
+    padding: 32px 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    position: relative;
+  }
+
+  .flow-step:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+  }
+
+  .flow-step + .flow-connector + .flow-step {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  .step-body h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .step-body p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .step-body strong { color: var(--text-h); }
+
+  .step-tag {
+    margin-top: 12px;
+  }
+
+  .mono-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    color: var(--accent);
+  }
+
+  .step-code-block {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+  }
+
+  .step-code-block code {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-h);
+  }
+
+  .step-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .accent-icon { border-color: var(--accent-border); background: var(--accent-bg); color: var(--accent); }
+  .ok-icon     { border-color: rgba(70,217,138,0.3); background: rgba(70,217,138,0.08); color: var(--ok); }
+
+  .flow-connector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 32px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .connector-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border) 0%, var(--accent-border) 50%, var(--border) 100%);
+  }
+
+  .connector-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text);
+    opacity: 0.55;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Token budget card */
+  .budget-card {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 16px 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .budget-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .budget-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-h);
+  }
+
+  .budget-chip {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+  }
+
+  .safe-chip {
+    color: var(--ok);
+    border-color: rgba(70,217,138,0.3);
+    background: rgba(70,217,138,0.08);
+  }
+
+  .budget-track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .budget-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s;
+  }
+
+  .safe-fill { background: linear-gradient(90deg, var(--ok), #10b981); }
+
+  .budget-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    opacity: 0.7;
+  }
+
+  .budget-note {
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ══ Safety grid ══════════════════════════════════════════════════════════ */
+  .safety-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 1020px;
+    margin: 0 auto;
+  }
+
+  .safety-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    transition: border-color 0.2s;
+  }
+
+  .safety-card:hover { border-color: var(--border-strong); }
+
+  .accent-safety {
+    border-color: var(--accent-border);
+    background: color-mix(in srgb, var(--accent-bg) 60%, var(--surface));
+  }
+
+  .safety-icon {
+    color: var(--text);
+    opacity: 0.7;
+  }
+
+  .accent-safety .safety-icon { color: var(--accent); opacity: 1; }
+
+  .safety-card h3 {
+    font-size: 16px;
+  }
+
+  .safety-card h3 code {
+    font-size: 14px;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .safety-card p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .safety-card p code {
+    font-size: 12px;
+    color: var(--text-h);
+    background: var(--code-bg);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  .safety-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 11px;
+    font-weight: 700;
+    width: fit-content;
+  }
+
+  /* ══ Features grid ════════════════════════════════════════════════════════ */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .feature-card:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .wide-card {
+    grid-column: span 3;
+  }
+
+  .feature-card-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .feature-meta { display: flex; flex-direction: column; gap: 10px; }
+
+  .feature-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+  }
+
+  .feature-card h3 {
+    font-size: 20px;
+    letter-spacing: -0.3px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+  }
+
+  .feature-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 16px;
+    list-style: disc;
+  }
+
+  .feature-bullets li {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Repo context visual */
+  .feature-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+
+  .context-file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+  }
+
+  .context-file.included {
+    border-color: var(--accent-border);
+    background: color-mix(in srgb, var(--accent-bg) 50%, var(--surface));
+  }
+
+  .file-check { color: var(--ok); font-size: 12px; font-weight: 700; }
+  .file-uncheck { color: var(--text); opacity: 0.4; font-size: 12px; }
+  .mono-sm { font-family: var(--mono); font-size: 12px; color: var(--text-h); flex: 1; }
+  .file-size { font-family: var(--mono); font-size: 11px; color: var(--text); opacity: 0.55; }
+
+  .context-summary { margin-top: 4px; }
+  .summary-chip {
+    display: inline-flex;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+
+  /* A/B visual */
+  .ab-visual {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    height: 100px;
+  }
+
+  .ab-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .ab-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text);
+    opacity: 0.6;
+  }
+
+  .selected-label { color: var(--accent); opacity: 1; }
+
+  .ab-bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+    background: var(--border-strong);
+  }
+
+  .selected-bar { background: var(--accent); }
+
+  .ab-vs {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Project memory visual */
+  .memory-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .memory-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .active-entry {
+    border-color: var(--accent-border);
+    background: color-mix(in srgb, var(--accent-bg) 50%, var(--surface));
+  }
+
+  .memory-label {
+    font-size: 12px;
+    color: var(--text);
+    flex: 1;
+    font-family: var(--mono);
+  }
+
+  .memory-arrow { font-size: 12px; color: var(--text); opacity: 0.5; }
+  .accent-arrow { color: var(--accent); opacity: 1; }
+
+  .memory-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .accent-chip {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--accent-ink);
+  }
+
+  /* Library visual */
+  .library-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .lib-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+
+  .lib-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-h);
+  }
+
+  .lib-tags {
+    display: flex;
+    gap: 4px;
+  }
+
+  .lib-tag {
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* Agent pills */
+  .agent-pills-visual {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .agent-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+
+  .active-agent {
+    border-color: var(--accent-border);
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+
+  /* Image pill */
+  .image-pill-visual {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+
+  .img-thumb-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .img-meta-sm {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .size-sm {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    opacity: 0.55;
+  }
+
+  /* ══ CTA ══════════════════════════════════════════════════════════════════ */
+  .cta-section {
+    position: relative;
+    padding: 100px 40px;
+    text-align: center;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+  }
+
+  .cta-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(60% 80% at 50% 110%, rgba(200,247,80,0.10) 0%, transparent 70%);
+  }
+
+  .cta-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .cta-content h2 {
+    font-size: clamp(32px, 5vw, 52px);
+    letter-spacing: -1px;
+  }
+
+  .cta-content > p {
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .cta-steps {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-h);
+  }
+
+  .cta-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-border);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--mono);
+    flex-shrink: 0;
+  }
+
+  .cta-divider {
+    color: var(--text);
+    opacity: 0.4;
+    font-size: 16px;
+  }
+
+  .cta-note {
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0.65;
+  }
+
+  /* ══ Footer ═══════════════════════════════════════════════════════════════ */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer-logo {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--text-h);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 16px;
+  }
+
+  .footer-links a {
+    font-size: 13px;
+    color: var(--text);
+    transition: color 0.15s;
+  }
+
+  .footer-links a:hover { color: var(--text-h); }
+
+  .footer-note {
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0.55;
+  }
+
+  /* ══ Animations ═══════════════════════════════════════════════════════════ */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  @keyframes conduit {
+    0%   { background-position: 0 -100%; }
+    100% { background-position: 0 100%; }
+  }
+
+  /* Browser AI provider pill — accent-bordered to stand out */
+  .browser-ai-pill {
+    border-color: var(--accent-border);
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+
+  /* Iterative refinement visual */
+  .adjust-visual {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+  }
+
+  .adjust-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .active-adjust {
+    border-color: var(--accent-border);
+    background: color-mix(in srgb, var(--accent-bg) 50%, var(--surface));
+  }
+
+  .adjust-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .accent-adjust-badge {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--accent-ink);
+  }
+
+  .adjust-text {
+    font-size: 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .adjust-arrow {
+    font-size: 11px;
+    color: var(--accent);
+    padding: 2px 10px;
+    opacity: 0.7;
+  }
+
+  /* ══ Why RyFine section ══════════════════════════════════════════════════ */
+  .why-section {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Faint radial glow behind the section */
+  .why-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 50% at 50% 60%, rgba(200,247,80,0.055) 0%, transparent 70%);
+  }
+
+  /* ── Flow diagram ─────────────────────────────────────────────────────── */
+  .why-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 1000px;
+    margin: 0 auto 72px;
+    padding: 36px 40px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: var(--surface);
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+  }
+
+  /* Nodes */
+  .why-node {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .why-node-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.9px;
+    color: var(--text);
+    opacity: 0.5;
+  }
+
+  /* Input node */
+  .why-node-input { width: 196px; }
+
+  .why-prompt-snap {
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  /* RyFine center node */
+  .why-node-rf {
+    align-items: center;
+    text-align: center;
+    padding: 22px 24px;
+    border: 1px solid var(--accent-border);
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--accent-bg) 70%, var(--surface));
+    position: relative;
+    flex-shrink: 0;
+    width: 160px;
+    box-shadow:
+      0 0 0 1px rgba(200,247,80,0.12),
+      0 8px 32px rgba(200,247,80,0.12),
+      inset 0 1px 0 rgba(200,247,80,0.08);
+  }
+
+  .why-rf-glow {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(200,247,80,0.14) 0%, transparent 70%);
+    pointer-events: none;
+    animation: why-glow-breathe 3s ease-in-out infinite;
+  }
+
+  @keyframes why-glow-breathe {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.08); }
+  }
+
+  .why-rf-logo {
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+
+  .why-rf-name {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--text-h);
+    letter-spacing: -0.2px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .why-rf-sub {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    opacity: 0.85;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  /* Tools node */
+  .why-node-tools { width: 160px; }
+
+  .why-tools-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-left: 2px solid var(--border-strong);
+    padding-left: 14px;
+    position: relative;
+  }
+
+  /* Animated green stem */
+  .why-tools-list::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent) 0%, var(--accent-border) 100%);
+    opacity: 0.6;
+    animation: why-stem-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes why-stem-pulse {
+    0%, 100% { opacity: 0.35; }
+    50%       { opacity: 0.75; }
+  }
+
+  .why-tool {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-h);
+    padding: 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+
+  /* Short branch tick from stem to each tool */
+  .why-tool::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: 50%;
+    width: 8px;
+    height: 1px;
+    background: var(--accent-border);
+    transform: translateY(-50%);
+  }
+
+  .why-tool-muted {
+    color: var(--text);
+    opacity: 0.5;
+    font-size: 12px;
+    font-weight: 500;
+    font-style: italic;
+  }
+
+  /* Connector lines */
+  .why-conn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 4px;
+    min-width: 48px;
+  }
+
+  .why-conn-track {
+    width: 100%;
+    height: 2px;
+    background: var(--border-strong);
+    border-radius: 999px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .why-conn-pulse {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
+    background-size: 200% 100%;
+    animation: why-pulse-travel 1.6s linear infinite;
+  }
+
+  .why-conn-right .why-conn-pulse {
+    animation-delay: 0.8s;
+  }
+
+  @keyframes why-pulse-travel {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -100% 0; }
+  }
+
+  .why-conn-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text);
+    opacity: 0.4;
+  }
+
+  .why-flow-caption {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--text);
+    opacity: 0.4;
+    white-space: nowrap;
+    font-style: italic;
+  }
+
+  /* ── Proposition cards ────────────────────────────────────────────────── */
+  .why-props {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px;
+    max-width: 1000px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--border);
+  }
+
+  .why-prop {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 32px 28px;
+    background: var(--surface);
+    transition: background 0.2s;
+  }
+
+  .why-prop:hover {
+    background: var(--surface-2);
+  }
+
+  .why-prop-accent {
+    background: color-mix(in srgb, var(--accent-bg) 40%, var(--surface));
+    border-top: 2px solid var(--accent);
+    margin-top: -2px;
+  }
+
+  .why-prop-accent:hover {
+    background: color-mix(in srgb, var(--accent-bg) 60%, var(--surface));
+  }
+
+  .why-prop-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .why-prop-accent .why-prop-icon {
+    border-color: var(--accent-border);
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+
+  .why-prop h3 {
+    font-size: 17px;
+    letter-spacing: -0.2px;
+    line-height: 1.25;
+  }
+
+  .why-prop p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  /* ── Responsive ───────────────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .why-flow {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 16px;
+      padding: 28px;
+    }
+
+    .why-node-input,
+    .why-node-tools { width: 100%; }
+
+    .why-node-rf { width: 100%; flex-direction: row; gap: 16px; align-items: center; text-align: left; }
+
+    .why-rf-sub { text-align: left; }
+
+    .why-conn { flex-direction: row; align-items: center; gap: 8px; }
+
+    .why-conn-track { flex: 1; height: 2px; }
+
+    .why-conn-pulse { animation-name: why-pulse-travel; }
+
+    .why-tools-list { flex-direction: row; flex-wrap: wrap; border-left: none;
+                      border-top: 2px solid var(--border-strong); padding-left: 0; padding-top: 12px; gap: 8px; }
+
+    .why-tools-list::before { display: none; }
+
+    .why-tool::before { display: none; }
+
+    .why-flow-caption { position: static; transform: none; text-align: center; padding-top: 8px; white-space: normal; }
+
+    .why-props { grid-template-columns: 1fr; }
+
+    .why-prop-accent { margin-top: 0; border-top: none; border-left: 3px solid var(--accent); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sol-c, .badge-dot, .cursor-blink, .demo-conduit,
+    .hero-content, .hero-demo { animation: none !important; }
+  }
+
+  /* ══ Responsive ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 1100px) {
+    .safety-grid { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+    .wide-card { grid-column: span 2; }
+    .feature-card-inner { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+      padding: 60px 32px 72px;
+      min-height: auto;
+      gap: 48px;
+    }
+    .section { padding: 72px 32px; }
+    .nav-links { display: none; }
+    .flow-step { grid-template-columns: 48px 1fr; }
+    .step-icon { display: none; }
+  }
+
+  @media (max-width: 640px) {
+    .nav { padding: 0 20px; }
+    .hero { padding: 48px 20px 60px; }
+    .section { padding: 60px 20px; }
+    .safety-grid { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .wide-card { grid-column: span 1; }
+    .cta-steps { flex-direction: column; }
+    .cta-divider { transform: rotate(90deg); }
+    .footer-inner { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .footer-logo { margin-right: 0; }
+  }
+</style>

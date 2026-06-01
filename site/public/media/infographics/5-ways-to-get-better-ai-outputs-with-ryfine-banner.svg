@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">5 Ways to Get Better AI Outputs with RyFine banner</title>
+  <desc id="desc">A banner infographic showing five practical ways RyFine improves prompt quality and downstream AI output.</desc>
+  <rect width="1200" height="630" rx="32" fill="#0c1014" />
+  <circle cx="1030" cy="120" r="170" fill="#c8f750" fill-opacity="0.12" />
+  <text x="60" y="78" fill="#c8f750" font-family="Geist Mono, monospace" font-size="20" letter-spacing="3">RYFINE PLAYBOOK</text>
+  <text x="60" y="170" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="128" font-weight="800">5</text>
+  <text x="178" y="138" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="58" font-weight="800">Ways to Get Better</text>
+  <text x="178" y="196" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="58" font-weight="800">AI Outputs with RyFine</text>
+  <text x="178" y="242" fill="#b8b8c5" font-family="Hanken Grotesk, sans-serif" font-size="24">Refine first, then execute with the model you trust.</text>
+
+  <g font-family="Hanken Grotesk, sans-serif" font-size="23">
+    <rect x="60" y="308" width="520" height="70" rx="20" fill="#14141a" /><text x="92" y="352" fill="#c8f750" font-weight="700">01</text><text x="150" y="352" fill="#f4f4f6">Refine before the expensive run.</text>
+    <rect x="60" y="398" width="520" height="70" rx="20" fill="#14141a" /><text x="92" y="442" fill="#c8f750" font-weight="700">02</text><text x="150" y="442" fill="#f4f4f6">Use Rules and Skills for reusable constraints.</text>
+    <rect x="60" y="488" width="520" height="70" rx="20" fill="#14141a" /><text x="92" y="532" fill="#c8f750" font-weight="700">03</text><text x="150" y="532" fill="#f4f4f6">Attach only relevant context.</text>
+
+    <rect x="620" y="308" width="520" height="70" rx="20" fill="#14141a" /><text x="652" y="352" fill="#c8f750" font-weight="700">04</text><text x="710" y="352" fill="#f4f4f6">Save winning prompt structures.</text>
+    <rect x="620" y="398" width="520" height="70" rx="20" fill="#14141a" /><text x="652" y="442" fill="#c8f750" font-weight="700">05</text><text x="710" y="442" fill="#f4f4f6">Compare models when stakes are high.</text>
+  </g>
+
+  <text x="60" y="590" fill="#c8f750" font-family="Geist Mono, monospace" font-size="20" letter-spacing="2">Learn more at ryfine.app</text>
+</svg>

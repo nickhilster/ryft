@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img" aria-labelledby="title desc">
+  <title id="title">5 Ways to Get Better AI Outputs with RyFine</title>
+  <desc id="desc">A square infographic listing five practical ways RyFine improves downstream AI output quality.</desc>
+  <rect width="1080" height="1080" rx="46" fill="#0c1014" />
+  <circle cx="910" cy="186" r="156" fill="#c8f750" fill-opacity="0.12" />
+  <circle cx="170" cy="920" r="220" fill="#5cc8ff" fill-opacity="0.08" />
+  <text x="76" y="100" fill="#c8f750" font-family="Geist Mono, monospace" font-size="24" letter-spacing="3">RYFINE PLAYBOOK</text>
+  <text x="76" y="208" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="172" font-weight="800">5</text>
+  <text x="224" y="176" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="62" font-weight="800">Ways to Get Better</text>
+  <text x="224" y="240" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="62" font-weight="800">AI Outputs with RyFine</text>
+  <text x="224" y="292" fill="#b8b8c5" font-family="Hanken Grotesk, sans-serif" font-size="28">Use refinement as the front door to every higher-stakes prompt.</text>
+
+  <g font-family="Hanken Grotesk, sans-serif">
+    <rect x="76" y="380" width="928" height="104" rx="24" fill="#14141a" /><text x="112" y="432" fill="#c8f750" font-size="28" font-weight="700">01</text><text x="186" y="432" fill="#f4f4f6" font-size="30" font-weight="700">Refine before you spend tokens on the real task.</text><text x="186" y="466" fill="#8b8b99" font-size="22">Use RyFine to clean up intent, scope, and constraints first.</text>
+    <rect x="76" y="508" width="928" height="104" rx="24" fill="#14141a" /><text x="112" y="560" fill="#c8f750" font-size="28" font-weight="700">02</text><text x="186" y="560" fill="#f4f4f6" font-size="30" font-weight="700">Put durable constraints in Rules and Skills.</text><text x="186" y="594" fill="#8b8b99" font-size="22">Keep structure and domain knowledge outside the raw prompt.</text>
+    <rect x="76" y="636" width="928" height="104" rx="24" fill="#14141a" /><text x="112" y="688" fill="#c8f750" font-size="28" font-weight="700">03</text><text x="186" y="688" fill="#f4f4f6" font-size="30" font-weight="700">Attach only the context that clarifies the task.</text><text x="186" y="722" fill="#8b8b99" font-size="22">Signal beats volume when you are grounding a refinement.</text>
+    <rect x="76" y="764" width="928" height="104" rx="24" fill="#14141a" /><text x="112" y="816" fill="#c8f750" font-size="28" font-weight="700">04</text><text x="186" y="816" fill="#f4f4f6" font-size="30" font-weight="700">Save prompt structures that prove reusable.</text><text x="186" y="850" fill="#8b8b99" font-size="22">Turn one good run into a repeatable template in the Library.</text>
+    <rect x="76" y="892" width="928" height="104" rx="24" fill="#14141a" /><text x="112" y="944" fill="#c8f750" font-size="28" font-weight="700">05</text><text x="186" y="944" fill="#f4f4f6" font-size="30" font-weight="700">Compare models when the downstream task is expensive.</text><text x="186" y="978" fill="#8b8b99" font-size="22">Use A/B to choose the stronger refinement before execution.</text>
+  </g>
+
+  <text x="76" y="1038" fill="#c8f750" font-family="Geist Mono, monospace" font-size="22" letter-spacing="2">TRY RYFINE NOW · ryfine.app</text>
+</svg>

@@ -1,0 +1,194 @@
+/* ── BoostMeta — transparency + feedback strip ──────────────── */
+
+.boost-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ── Left: agent + skills ────────────────────────────────────── */
+
+.boost-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.boost-meta-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--display);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.boost-meta-skills {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.boost-meta-skill {
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* ── Rationale info button + popover ────────────────────────── */
+
+.boost-meta-info-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.boost-meta-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.boost-meta-info-btn:hover,
+.boost-meta-info-btn.is-open {
+  border-color: var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.boost-meta-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  animation: popover-in 0.15s ease;
+}
+
+.boost-meta-popover::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--border-strong);
+}
+
+@keyframes popover-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0);   }
+}
+
+.boost-meta-popover-title {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--display);
+  color: var(--text-h);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.boost-meta-popover-text {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* ── Right: feedback ─────────────────────────────────────────── */
+
+.boost-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.boost-meta-feedback-label {
+  font-size: 11px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.boost-meta-feedback-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.boost-meta-feedback-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.boost-meta-feedback-btn:active {
+  transform: scale(0.9);
+}
+
+.boost-meta-feedback-btn.is-selected-up {
+  border-color: var(--ok);
+  background: rgba(70, 217, 138, 0.12);
+}
+
+.boost-meta-feedback-btn.is-selected-down {
+  border-color: var(--danger);
+  background: rgba(255, 93, 93, 0.12);
+}
+
+.boost-meta-thanks {
+  font-size: 11px;
+  color: var(--ok);
+  animation: thanks-in 0.2s ease;
+}
+
+@keyframes thanks-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}

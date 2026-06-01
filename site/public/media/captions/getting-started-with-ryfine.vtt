@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00.000 --> 00:18.000
+If your first prompt is usually a messy draft, RyFine is the fastest way to turn it into something an AI model can actually execute well.
+
+00:18.000 --> 00:44.000
+RyFine is local-first. You choose the provider and model, your keys stay in this browser, and Browser AI or Ollama can run without a hosted API at all.
+
+00:44.000 --> 01:45.000
+Paste your raw prompt into the left pane. Add a hosted key once if you need it, then hit RyFine and watch the refined prompt stream into the output pane.
+
+01:45.000 --> 02:18.000
+This works best when you know the task but not the cleanest way to ask for it. RyFine keeps your intent and removes ambiguity before you spend tokens downstream.
+
+02:18.000 --> 02:30.000
+Try RyFine now and sharpen your next prompt in one pass.

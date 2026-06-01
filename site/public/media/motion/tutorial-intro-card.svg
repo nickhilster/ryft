@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" role="img" aria-labelledby="title desc">
+  <title id="title">RyFine tutorial intro card</title>
+  <desc id="desc">A branded intro title card for RyFine video tutorials.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090a0d" />
+      <stop offset="100%" stop-color="#111823" />
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)" />
+  <circle cx="1480" cy="170" r="220" fill="#c8f750" fill-opacity="0.12" />
+  <circle cx="260" cy="890" r="320" fill="#5cc8ff" fill-opacity="0.08" />
+  <g opacity="0.14">
+    <path d="M0 180H1920" stroke="#ffffff" />
+    <path d="M0 360H1920" stroke="#ffffff" />
+    <path d="M0 540H1920" stroke="#ffffff" />
+    <path d="M0 720H1920" stroke="#ffffff" />
+    <path d="M0 900H1920" stroke="#ffffff" />
+    <path d="M240 0V1080" stroke="#ffffff" />
+    <path d="M480 0V1080" stroke="#ffffff" />
+    <path d="M720 0V1080" stroke="#ffffff" />
+    <path d="M960 0V1080" stroke="#ffffff" />
+    <path d="M1200 0V1080" stroke="#ffffff" />
+    <path d="M1440 0V1080" stroke="#ffffff" />
+    <path d="M1680 0V1080" stroke="#ffffff" />
+  </g>
+  <g transform="translate(196 184)">
+    <text x="0" y="0" fill="#c8f750" font-family="Geist Mono, monospace" font-size="34" letter-spacing="6">RYFINE TUTORIAL</text>
+    <text x="0" y="160" fill="#f4f4f6" font-family="Bricolage Grotesque, sans-serif" font-size="154" font-weight="800">Sharpen every prompt.</text>
+    <text x="0" y="258" fill="#b8b8c5" font-family="Hanken Grotesk, sans-serif" font-size="56">Local-first prompt refinement for AI-native workflows</text>
+  </g>
+  <g transform="translate(196 676)">
+    <rect width="824" height="212" rx="34" fill="#14141a" stroke="#ffffff" stroke-opacity="0.08" />
+    <text x="56" y="72" fill="#5cc8ff" font-family="Geist Mono, monospace" font-size="30" letter-spacing="4">USE FOR</text>
+    <text x="56" y="132" fill="#f4f4f6" font-family="Hanken Grotesk, sans-serif" font-size="50" font-weight="700">Rough prompts, reusable systems, and context-aware refinements</text>
+  </g>
+</svg>

@@ -1,0 +1,10 @@
+{
+    "workbench.colorTheme": "HighCoCo Neon: Lime",
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#000000",
+        "statusBar.foreground": "#39FF14",
+        "statusBar.border": "#39FF1444",
+        "statusBarItem.hoverBackground": "#39FF1433",
+        "statusBarItem.activeBackground": "#39FF1455"
+    }
+}

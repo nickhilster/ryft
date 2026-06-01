@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PromptBoost Web Test Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface-alt: #eef3ff;
+      --text: #1b2330;
+      --muted: #5d6a7a;
+      --border: #d8dfeb;
+      --accent: #1d5cff;
+      --accent-soft: #e8f0ff;
+      --pass: #18794e;
+      --pass-soft: #e8f7ef;
+      --warn: #9a6700;
+      --warn-soft: #fff4d8;
+      --fail: #b42318;
+      --fail-soft: #fdecea;
+      --shadow: 0 18px 48px rgba(24, 39, 75, 0.08);
+      --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+      --sans: "Segoe UI", Inter, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at top right, rgba(29, 92, 255, 0.1), transparent 30%),
+        linear-gradient(180deg, #f9fbff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .page {
+      width: min(1200px, calc(100vw - 32px));
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 20px;
+    }
+
+    .hero,
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      line-height: 1.15;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-bottom: 14px;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .hero-grid,
+    .meta-grid,
+    .summary-grid,
+    .detail-grid,
+    .visual-grid,
+    .notes-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-grid,
+    .meta-grid,
+    .summary-grid,
+    .visual-grid,
+    .notes-grid {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .summary-card,
+    .meta-card,
+    .detail-card,
+    .visual-card,
+    .note-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .summary-card strong,
+    .meta-card strong,
+    .note-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .hero-copy {
+      grid-column: span 8;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero-actions {
+      grid-column: span 4;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .button,
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-alt);
+      color: var(--text);
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .button:hover,
+    button:hover {
+      transform: translateY(-1px);
+      border-color: #c2cce0;
+      background: #f7faff;
+    }
+
+    .button.primary,
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .status-row,
+    .facts,
+    .kpi-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .status-pill,
+    .fact-pill,
+    .kpi {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .status-pass,
+    .kpi-pass {
+      background: var(--pass-soft);
+      color: var(--pass);
+      border-color: #b8e3cb;
+    }
+
+    .status-warn,
+    .kpi-warn {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-color: #f0d28a;
+    }
+
+    .status-fail,
+    .kpi-fail {
+      background: var(--fail-soft);
+      color: var(--fail);
+      border-color: #f5c0b8;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .meta-card:nth-child(1) { grid-column: span 4; }
+    .meta-card:nth-child(2) { grid-column: span 4; }
+    .meta-card:nth-child(3) { grid-column: span 4; }
+    .summary-card:nth-child(1) { grid-column: span 3; }
+    .summary-card:nth-child(2) { grid-column: span 3; }
+    .summary-card:nth-child(3) { grid-column: span 3; }
+    .summary-card:nth-child(4) { grid-column: span 3; }
+    .visual-card,
+    .note-card { grid-column: span 6; }
+
+    .detail-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .detail-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .detail-card header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .detail-card header div {
+      display: grid;
+      gap: 5px;
+    }
+
+    .detail-card h3 {
+      font-size: 1rem;
+    }
+
+    .detail-card small {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    dl {
+      display: grid;
+      grid-template-columns: minmax(120px, 150px) 1fr;
+      gap: 8px 12px;
+      margin: 0;
+    }
+
+    dt {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    dd {
+      margin: 0;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    code,
+    pre {
+      font-family: var(--mono);
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      border-radius: 14px;
+      background: #111827;
+      color: #f3f7ff;
+      overflow-x: auto;
+      font-size: 0.87rem;
+      line-height: 1.55;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    caption {
+      text-align: left;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fbff;
+      font-size: 0.88rem;
+      color: var(--text);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    figure {
+      margin: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #f9fbff;
+    }
+
+    figcaption {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: var(--mono);
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 960px) {
+      .hero-copy,
+      .hero-actions,
+      .meta-card,
+      .summary-card,
+      .visual-card,
+      .note-card {
+        grid-column: 1 / -1 !important;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: #ffffff;
+      }
+
+      .page {
+        width: 100%;
+        margin: 0;
+      }
+
+      .hero,
+      .panel,
+      .summary-card,
+      .meta-card,
+      .detail-card,
+      .visual-card,
+      .note-card {
+        box-shadow: none;
+      }
+
+      .button-row {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero" aria-labelledby="report-title">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Browser QA Report</span>
+          <h1 id="report-title">PromptBoost Web Browser Test Report</h1>
+          <p>This report captures a real-browser validation pass of the PromptBoost web application running locally via Vite. The run focused on launch behavior, input handling, repo-context persistence, compare-mode behavior, explicit error handling, and delayed-response responsiveness.</p>
+          <div class="status-row" aria-label="Overall result summary">
+            <span class="status-pill status-pass">7 passed</span>
+            <span class="status-pill status-warn">1 partial</span>
+            <span class="status-pill">0 failed</span>
+          </div>
+        </div>
+        <aside class="hero-actions" aria-label="Download options">
+          <div class="button-row">
+            <a class="button primary" download href="promptboost-web-test-report.html">Download HTML</a>
+            <button type="button" onclick="window.print()">Print / Save PDF</button>
+            <button type="button" onclick="downloadJsonReport()">Download JSON</button>
+          </div>
+          <div class="facts">
+            <span class="fact-pill">Timestamp: <span class="mono">2026-05-28T18:13:38-04:00</span></span>
+            <span class="fact-pill">Commit: <span class="mono">de188cb</span></span>
+            <span class="fact-pill">App version: <span class="mono">0.9.0</span></span>
+            <span class="fact-pill">Web package: <span class="mono">0.0.0</span></span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="environment-heading">
+      <h2 id="environment-heading">Environment</h2>
+      <div class="meta-grid">
+        <article class="meta-card">
+          <strong>Browser</strong>
+          <p>VS Code integrated browser using Chromium 142.0.7444.265 on Windows 10 x64.</p>
+          <p class="mono">Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.0 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36</p>
+        </article>
+        <article class="meta-card">
+          <strong>Deployment Surface</strong>
+          <p>Application served from <span class="mono">http://127.0.0.1:4173/</span> using the local Vite development server.</p>
+          <p>Observed response headers: <span class="mono">cache-control: no-cache</span>, <span class="mono">content-type: text/html</span>. No <span class="mono">Content-Security-Policy</span> header was present in this dev-server response.</p>
+        </article>
+        <article class="meta-card">
+          <strong>Tools Used</strong>
+          <p>VS Code browser automation, Playwright page scripting, mocked Ollama-compatible SSE responses, and local validation commands:</p>
+          <pre>npm --prefix web run test
+npm --prefix web run lint
+npm --prefix web run build</pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Executive Summary</h2>
+      <div class="summary-grid">
+        <article class="summary-card">
+          <strong>Primary Input Format</strong>
+          <p>Main prompt entry is plain text in a multiline textarea. Optional boost rules are also plain text.</p>
+        </article>
+        <article class="summary-card">
+          <strong>Repo Context Uploads</strong>
+          <p>Accepted extensions: <span class="mono">.md, .txt, .ts, .tsx, .js, .jsx, .json, .css, .html, .yml, .yaml, .toml, .xml, .py, .java, .go, .rs, .c, .cpp, .h, .hpp, .cs, .rb, .php, .sql, .sh</span>.</p>
+        </article>
+        <article class="summary-card">
+          <strong>Best-Path Result</strong>
+          <p>Compare mode completed successfully with two mocked model requests, exposed selection controls, and correctly promoted the repo-aware result back into the main output.</p>
+        </article>
+        <article class="summary-card">
+          <strong>Main Risk Noted</strong>
+          <p>The delayed-response simulation kept the UI responsive and showed the Stop control, but the mocked delayed stream did not settle to a completed output in this test harness.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="case-summary-heading">
+      <h2 id="case-summary-heading">Test Case Summary</h2>
+      <table>
+        <caption>Executed browser cases and their outcomes</caption>
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Scenario</th>
+            <th scope="col">Input</th>
+            <th scope="col">Expected Outcome</th>
+            <th scope="col">Actual Outcome</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono nowrap">TC-01</td>
+            <td>Launch over HTTP with settings visible</td>
+            <td>Initial page load</td>
+            <td>Page loads with settings visible and boost disabled until input exists.</td>
+            <td><span class="mono">PromptBoost</span> loaded at <span class="mono">http://127.0.0.1:4173/</span>; settings UI was visible; boost button was disabled.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-02</td>
+            <td>Empty input handling</td>
+            <td>Empty prompt textarea</td>
+            <td>Empty submissions are prevented.</td>
+            <td>Both the main Clear button and Boost button were disabled with no prompt text.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-03</td>
+            <td>Repo files persist after reload</td>
+            <td>Upload <span class="mono">README.md</span> and <span class="mono">package.json</span></td>
+            <td>Uploaded repo context survives a full reload.</td>
+            <td>Summary stayed at <span class="mono">2 of 2 included / 5,697 chars selected</span> before and after reload.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-04</td>
+            <td>Special character prompt input</td>
+            <td>JSON, XML-like text, ampersands, angle brackets, and emoji</td>
+            <td>Input is accepted as plain text and the app remains usable.</td>
+            <td>Textarea accepted the full string, displayed <span class="mono">78 chars</span>, and enabled Boost.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-05</td>
+            <td>Large input responsiveness</td>
+            <td>12,000-character plain-text prompt</td>
+            <td>Char count stays correct and UI remains responsive.</td>
+            <td>Textarea updated to <span class="mono">12000 chars</span> in about <span class="mono">45 ms</span>; Chromium heap snapshot recorded about <span class="mono">20.8 MB</span> used JS heap.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-06</td>
+            <td>Compare mode choose-and-use workflow</td>
+            <td>Repo-aware prompt with mocked Ollama SSE responses</td>
+            <td>Two compare cards appear, the repo-aware card can be selected, and the selected result can become the main output.</td>
+            <td>Compare mode completed in <span class="mono">189 ms</span>; two requests were issued; the repo-aware card was selected and promoted to the main output.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-07</td>
+            <td>API error handling</td>
+            <td>Forced <span class="mono">500</span> response with message <span class="mono">Synthetic test failure</span></td>
+            <td>A visible error is shown without clearing input or crashing the page.</td>
+            <td>Output pane showed <span class="mono">500 Synthetic test failure</span>; the typed prompt remained intact.</td>
+            <td><span class="status-pill status-pass">Pass</span></td>
+          </tr>
+          <tr>
+            <td class="mono nowrap">TC-08</td>
+            <td>Slow-response responsiveness</td>
+            <td>Mocked delayed Ollama-compatible response with 1.4 s hold</td>
+            <td>UI should remain responsive under latency and eventually render the delayed response.</td>
+            <td>Stop became visible within the loading state and no console errors were logged, but the mocked delayed stream remained in <span class="mono">Boosting…</span> during the observation window.</td>
+            <td><span class="status-pill status-warn">Partial</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel" aria-labelledby="detail-heading">
+      <h2 id="detail-heading">Actual Results</h2>
+      <div class="detail-grid">
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Launch and Input Surface</h3>
+              <small>TC-01, TC-02, TC-04</small>
+            </div>
+            <span class="status-pill status-pass">Pass</span>
+          </header>
+          <dl>
+            <dt>Browser</dt>
+            <dd class="mono">Chrome 142 via VS Code / Electron 39.8.8</dd>
+            <dt>URL</dt>
+            <dd class="mono">http://127.0.0.1:4173/</dd>
+            <dt>Observed input type</dt>
+            <dd>Plain text prompt entry with optional plain-text boost rules and optional uploaded repo context files.</dd>
+            <dt>Special-character result</dt>
+            <dd>Prompt text with braces, ampersands, angle brackets, and emoji was accepted unchanged and enabled the Boost action.</dd>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Persistence and Repo Context</h3>
+              <small>TC-03</small>
+            </div>
+            <span class="status-pill status-pass">Pass</span>
+          </header>
+          <dl>
+            <dt>Uploaded files</dt>
+            <dd><span class="mono">README.md</span> and <span class="mono">package.json</span></dd>
+            <dt>Before reload</dt>
+            <dd class="mono">2 of 2 included / 5,697 chars selected</dd>
+            <dt>After reload</dt>
+            <dd class="mono">2 of 2 included / 5,697 chars selected</dd>
+            <dt>Interpretation</dt>
+            <dd>IndexedDB-backed repo context persistence behaved as expected across a full page reload.</dd>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Large Input and Memory</h3>
+              <small>TC-05</small>
+            </div>
+            <span class="status-pill status-pass">Pass</span>
+          </header>
+          <dl>
+            <dt>Prompt size</dt>
+            <dd class="mono">12,000 chars</dd>
+            <dt>Fill duration</dt>
+            <dd class="mono">45 ms</dd>
+            <dt>Heap snapshot</dt>
+            <dd class="mono">usedJSHeapSize: 20,817,271; totalJSHeapSize: 25,725,227; jsHeapSizeLimit: 4,294,705,152</dd>
+            <dt>CPU metrics</dt>
+            <dd>No browser-exposed CPU instrumentation was available in this environment.</dd>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Compare Mode Workflow</h3>
+              <small>TC-06</small>
+            </div>
+            <span class="status-pill status-pass">Pass</span>
+          </header>
+          <dl>
+            <dt>Request count</dt>
+            <dd class="mono">2 mocked Ollama-compatible SSE requests</dd>
+            <dt>Summary copy</dt>
+            <dd class="mono">Repo-aware version is 23 chars longer and the same line count than the baseline.</dd>
+            <dt>Selection state</dt>
+            <dd>The repo-aware card became the selected compare card and enabled the toolbar-level copy/use actions.</dd>
+            <dt>Main output after use</dt>
+            <dd class="mono">Repo-aware boosted prompt with architecture details and grounded file references.</dd>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Error Handling</h3>
+              <small>TC-07</small>
+            </div>
+            <span class="status-pill status-pass">Pass</span>
+          </header>
+          <dl>
+            <dt>Injected failure</dt>
+            <dd class="mono">HTTP 500 / Synthetic test failure</dd>
+            <dt>Visible output</dt>
+            <dd class="mono">500 Synthetic test failure</dd>
+            <dt>Prompt retention</dt>
+            <dd>The input box preserved <span class="mono">Trigger a controlled API failure.</span></dd>
+            <dt>Console effect</dt>
+            <dd>Three expected browser console error entries were logged for the forced 500 response; no additional app crash signal appeared.</dd>
+          </dl>
+        </article>
+
+        <article class="detail-card">
+          <header>
+            <div>
+              <h3>Slow-Response Handling</h3>
+              <small>TC-08</small>
+            </div>
+            <span class="status-pill status-warn">Partial</span>
+          </header>
+          <dl>
+            <dt>Injected latency</dt>
+            <dd class="mono">1.4 s mocked delay</dd>
+            <dt>UI responsiveness</dt>
+            <dd>The Stop button appeared quickly and stayed visible, indicating the loading state remained interactive.</dd>
+            <dt>Observed duration</dt>
+            <dd class="mono">1,919 ms before snapshot; still loading after an additional 2,500 ms wait</dd>
+            <dt>Interpretation</dt>
+            <dd>The UI remained responsive, but delayed mocked streaming completion did not settle in the observation window. This is the main open item from the browser pass.</dd>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="security-heading">
+      <h2 id="security-heading">Security and Deployment Notes</h2>
+      <div class="notes-grid">
+        <article class="note-card">
+          <strong>Observed Security Posture</strong>
+          <ul>
+            <li>Testing ran against a local HTTP dev server at <span class="mono">127.0.0.1:4173</span>; no HTTPS or production reverse proxy was in scope for this run.</li>
+            <li>The dev-server HTML response did not include a <span class="mono">Content-Security-Policy</span> header. This is common in local development, but production deployment should validate CSP and other hardening headers separately.</li>
+            <li>No API keys or sensitive customer data were entered during testing. Repo-context uploads were limited to repository-local files already present in the workspace.</li>
+          </ul>
+        </article>
+        <article class="note-card">
+          <strong>Cross-Browser Coverage</strong>
+          <ul>
+            <li>Executed browser validation used the VS Code integrated Chromium-based browser only.</li>
+            <li>Firefox, Safari, and Edge were not executed in this environment, so cross-browser compatibility remains partially unverified.</li>
+            <li>Browser extensions and plug-ins were not used during testing.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="performance-heading">
+      <h2 id="performance-heading">Performance Notes</h2>
+      <div class="kpi-row">
+        <span class="kpi kpi-pass">Large prompt fill: 45 ms</span>
+        <span class="kpi kpi-pass">Compare flow completion: 189 ms on local mock</span>
+        <span class="kpi kpi-warn">Delayed mock remained in loading state past 4.4 s</span>
+      </div>
+      <ul>
+        <li>The editor stayed responsive with a 12,000-character prompt and maintained accurate character counts.</li>
+        <li>The compare flow completed quickly under a local mocked model response, including selection and main-output promotion.</li>
+        <li>Under injected latency the UI stayed interactive, but delayed mocked completion did not finalize in the observation window, so latency resilience is only partially validated.</li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="visual-heading">
+      <h2 id="visual-heading">Visual Aids</h2>
+      <div class="visual-grid">
+        <article class="visual-card">
+          <figure>
+            <img src="promptboost-test-compare.png" alt="PromptBoost compare mode showing baseline and repo-aware result cards with selection controls.">
+            <figcaption>Compare-mode screenshot captured during the successful mocked two-request flow. It shows the toolbar-level summary, metric chips, and side-by-side result cards.</figcaption>
+          </figure>
+        </article>
+        <article class="visual-card">
+          <figure>
+            <img src="promptboost-test-error.png" alt="PromptBoost output area showing a visible API failure message while the input remains preserved.">
+            <figcaption>Error-state screenshot captured during the forced 500-response test. The visible error stayed in the output pane while the typed prompt remained intact.</figcaption>
+          </figure>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="exceptions-heading">
+      <h2 id="exceptions-heading">Error / Exception Reports</h2>
+      <table>
+        <caption>Discrepancies and noteworthy exceptions</caption>
+        <thead>
+          <tr>
+            <th scope="col">Area</th>
+            <th scope="col">Observed Behavior</th>
+            <th scope="col">Impact</th>
+            <th scope="col">Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Delayed-response simulation</td>
+            <td>The mocked delayed single-boost request kept the UI in <span class="mono">Boosting…</span> even after the expected delay window.</td>
+            <td>Partial validation only for slow-network completion behavior.</td>
+            <td>Investigate long-running Ollama-compatible stream handling and add an automated browser test that asserts completion under synthetic latency.</td>
+          </tr>
+          <tr>
+            <td>Development security headers</td>
+            <td>No <span class="mono">Content-Security-Policy</span> header was observed in the local Vite response.</td>
+            <td>No direct issue for dev-only testing, but production hardening is unverified in this report.</td>
+            <td>Validate production headers on the deployed host separately from the dev-server workflow.</td>
+          </tr>
+          <tr>
+            <td>Forced API error</td>
+            <td>Expected browser console errors were emitted for the forced 500 response.</td>
+            <td>Low; the app still surfaced the error visibly and retained user input.</td>
+            <td>Accept for the forced-error scenario; no unexpected crash behavior was observed.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    const reportData = {
+      generatedAt: '2026-05-28T18:13:38-04:00',
+      commit: 'de188cb',
+      appVersion: '0.9.0',
+      webPackageVersion: '0.0.0',
+      browser: {
+        name: 'Chromium via VS Code integrated browser',
+        version: '142.0.7444.265',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.122.0 Chrome/142.0.7444.265 Electron/39.8.8 Safari/537.36'
+      },
+      summary: {
+        passed: 7,
+        partial: 1,
+        failed: 0
+      },
+      cases: [
+        {
+          id: 'TC-01',
+          status: 'pass',
+          scenario: 'Launch over HTTP with settings visible'
+        },
+        {
+          id: 'TC-02',
+          status: 'pass',
+          scenario: 'Empty input handling'
+        },
+        {
+          id: 'TC-03',
+          status: 'pass',
+          scenario: 'Repo files persist after reload'
+        },
+        {
+          id: 'TC-04',
+          status: 'pass',
+          scenario: 'Special character prompt input'
+        },
+        {
+          id: 'TC-05',
+          status: 'pass',
+          scenario: 'Large input responsiveness'
+        },
+        {
+          id: 'TC-06',
+          status: 'pass',
+          scenario: 'Compare mode choose-and-use workflow'
+        },
+        {
+          id: 'TC-07',
+          status: 'pass',
+          scenario: 'API error handling'
+        },
+        {
+          id: 'TC-08',
+          status: 'partial',
+          scenario: 'Slow-response responsiveness'
+        }
+      ]
+    };
+
+    function downloadJsonReport() {
+      const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'promptboost-web-test-report.json';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+plan_id: pipeline-upgrade-2026-05-29
+objective: implement the attached docs/pipeline-upgrade-plan.md end-to-end in the RyFine web app
+focus_area: core refinement pipeline in web/src/lib, especially current prompt assembly and provider call flow
+created_at: 2026-05-29
+created_by: GitHub Copilot
+status: completed
+
+tldr: |
+  - App-side refinement requests funnel through executeBoostRequest in web/src/App.tsx, which enriches each request with few-shot examples from recent project history before calling ryFine().
+  - The current pipeline in web/src/lib/ryFine.ts is still a two-function prompt builder: buildSystemPrompt() composes the system prompt and wrapUserMessage() composes the user payload, then ryFine() dispatches to provider-specific streaming functions.
+  - Phase 1 maps directly to replacing AGENT_SYSTEM_PROMPTS with a new skills registry; Phases 2 and 3 add new pure-TS classifier/assembler modules; Phase 4 rewires ryFine(), RyFineRequest, and provider helper signatures around assembled systemPrompt plus userMessage.
+  - Existing automated coverage does not test buildSystemPrompt(), wrapUserMessage(), or ryFine() directly; only the browser harness exercises the boost flow indirectly with a mock Ollama-compatible endpoint.
+
+research_metadata:
+  methodology: hybrid retrieval using semantic_search and grep_search, followed by targeted read_file reads on the App entry points, core pipeline helpers, supporting types, plan document, and existing tests
+  tools_used:
+    - semantic_search
+    - grep_search
+    - read_file
+    - memory.view
+    - run_in_terminal
+  scope: narrowed to App request assembly, web/src/lib/ryFine.ts prompt assembly and provider dispatch, supporting types in agents/projects/projectStorage/webllmProvider, and tests that exercise the boost flow
+  confidence: high
+  coverage: 85
+
+files_analyzed:
+  - file: App.tsx
+    path: web/src/App.tsx
+    purpose: Root UI entry point that gathers current prompt state, repo context, provider/model selection, and recent project history before invoking ryFine().
+    key_elements:
+      - element: BoostRunRequest
+        type: type
+        location: web/src/App.tsx:154
+        description: Local request shape derived from RyFineRequest with apiKey omitted until execution time.
+      - element: provider/model/agent state
+        type: pattern
+        location: web/src/App.tsx:431
+        description: Active provider, model, and agent are stored in component state and reused by all boost actions.
+      - element: executeBoostRequest
+        type: function
+        location: web/src/App.tsx:1104
+        description: Single gateway for boost calls; resolves provider key, loads few-shot examples, streams chunks into UI state, and archives successful results.
+      - element: repoContext assembly
+        type: pattern
+        location: web/src/App.tsx:1197
+        description: Repo context is assembled once from selected files and then passed through request.repoContext.
+      - element: boost
+        type: function
+        location: web/src/App.tsx:1200
+        description: Primary single-result action using current provider/model/agent/custom instructions/repo context.
+      - element: boostBoth
+        type: function
+        location: web/src/App.tsx:1229
+        description: Compare mode that runs two sequential ryFine() calls, first without repo context then with it.
+      - element: boostCompareModels
+        type: function
+        location: web/src/App.tsx:1276
+        description: Parallel compare mode that runs executeBoostRequest twice with different provider/model pairs.
+      - element: handleBoostPrompt
+        type: function
+        location: web/src/App.tsx:1384
+        description: Prompt-library launch path that also funnels into executeBoostRequest.
+      - element: adjustRefinement
+        type: function
+        location: web/src/App.tsx:1414
+        description: Iteration path that reuses prior output as promptText and merges ad hoc adjustment text into customInstructions.
+    language: TypeScript/TSX
+    lines: 2330
+  - file: ryFine.ts
+    path: web/src/lib/ryFine.ts
+    purpose: Core refinement pipeline implementation, including prompt assembly, provider dispatch, connection probing, and output-type detection.
+    key_elements:
+      - element: RyFineRequest
+        type: interface
+        location: web/src/lib/ryFine.ts:12
+        description: Current request contract; includes promptText, provider, apiKey, model, agent, customInstructions, repoContext, image, and fewShotExamples.
+      - element: AGENT_SYSTEM_PROMPTS
+        type: variable
+        location: web/src/lib/ryFine.ts:55
+        description: Hardcoded per-agent system prompt record targeted for replacement in Phase 1.
+      - element: buildSystemPrompt
+        type: function
+        location: web/src/lib/ryFine.ts:126
+        description: Current system prompt assembler; appends customInstructions and few-shot examples to the selected agent prompt.
+      - element: wrapUserMessage
+        type: function
+        location: web/src/lib/ryFine.ts:152
+        description: Current user-message assembler; wraps prompt text and optional repo context in XML-like tags.
+      - element: boostAnthropic
+        type: function
+        location: web/src/lib/ryFine.ts:173
+        description: Anthropic streaming call; currently rebuilds the user message internally via wrapUserMessage().
+      - element: boostOpenAICompat
+        type: function
+        location: web/src/lib/ryFine.ts:219
+        description: OpenAI-compatible streaming call used by OpenAI, DeepSeek, Ollama, OpenRouter, and Groq; also rebuilds the user message internally.
+      - element: boostGemini
+        type: function
+        location: web/src/lib/ryFine.ts:271
+        description: Native Gemini SSE implementation; currently embeds wrapUserMessage() output into request parts.
+      - element: ryFine
+        type: function
+        location: web/src/lib/ryFine.ts:482
+        description: Orchestrator that builds the system prompt, applies provider vision constraints, and dispatches to the provider-specific helper.
+      - element: detectOutputType
+        type: function
+        location: web/src/lib/ryFine.ts:528
+        description: Post-stream heuristic that flags likely answered prompts vs rewritten prompts.
+    language: TypeScript
+    lines: 466
+  - file: agents.ts
+    path: web/src/lib/agents.ts
+    purpose: Defines the agent union and UI metadata shared by the current prompt-selection system.
+    key_elements:
+      - element: Agent
+        type: type
+        location: web/src/lib/agents.ts:1
+        description: Eight-value union that currently matches the planned SkillId 1:1.
+      - element: AGENTS
+        type: variable
+        location: web/src/lib/agents.ts:17
+        description: UI-facing label/description list used by AgentSelector and prompt-library editing.
+    language: TypeScript
+    lines: 27
+  - file: projects.ts
+    path: web/src/lib/projects.ts
+    purpose: Defines prompt history records and the few-shot example extraction used before ryFine() calls.
+    key_elements:
+      - element: FewShotExample
+        type: interface
+        location: web/src/lib/projects.ts:19
+        description: Input/output pair injected into the current system prompt builder.
+      - element: buildFewShotExamples
+        type: function
+        location: web/src/lib/projects.ts:55
+        description: Truncates and limits recent prompt history to three examples before injection.
+    language: TypeScript
+    lines: 61
+  - file: projectStorage.ts
+    path: web/src/lib/projectStorage.ts
+    purpose: IndexedDB-backed project history storage used to fetch recent refinements for few-shot injection.
+    key_elements:
+      - element: getRecentRecords
+        type: function
+        location: web/src/lib/projectStorage.ts:123
+        description: Returns the most recent prompt records for buildFewShotExamples().
+    language: TypeScript
+    lines: 123
+  - file: webllmProvider.ts
+    path: web/src/lib/webllmProvider.ts
+    purpose: Browser AI provider implementation.
+    key_elements:
+      - element: boostWithBrowserAi
+        type: function
+        location: web/src/lib/webllmProvider.ts:154
+        description: Already accepts systemPrompt plus userPrompt as separate strings, making it the closest existing shape to the Phase 4 provider contract.
+    language: TypeScript
+    lines: 185
+  - file: browserReport.ts
+    path: web/tests/browserReport.ts
+    purpose: Playwright-style browser harness that exercises the UI against a local mock Ollama-compatible endpoint.
+    key_elements:
+      - element: waitForRequestCount
+        type: function
+        location: web/tests/browserReport.ts:313
+        description: Helper used to verify that boost flows issue the expected number of mock requests.
+      - element: TC-06 compare mode choose-and-use workflow
+        type: test
+        location: web/tests/browserReport.ts:530
+        description: Verifies the compare flow issues two requests and promotes the repo-aware result back into the main output.
+      - element: TC-07 API error handling
+        type: test
+        location: web/tests/browserReport.ts:560
+        description: Verifies that a failed mock provider response surfaces an error while preserving editor input.
+      - element: TC-08 slow-response responsiveness
+        type: test
+        location: web/tests/browserReport.ts:589
+        description: Verifies the loading state and Stop control during a delayed streaming response.
+    language: TypeScript
+    lines: 585
+  - file: repoContext.test.ts
+    path: web/tests/repoContext.test.ts
+    purpose: Unit coverage for repository context assembly helpers.
+    key_elements:
+      - element: repo context helpers tests
+        type: test
+        location: web/tests/repoContext.test.ts:13
+        description: Covers buildRepoContext() and related helper behavior but not ryFine() prompt wrapping.
+    language: TypeScript
+    lines: 76
+  - file: savedPrompts.test.ts
+    path: web/tests/savedPrompts.test.ts
+    purpose: Unit coverage for saved prompt storage and import helpers.
+    key_elements:
+      - element: saved prompt helpers tests
+        type: test
+        location: web/tests/savedPrompts.test.ts:33
+        description: Covers stored agent/provider metadata round-trips but not the refinement pipeline.
+    language: TypeScript
+    lines: 102
+
+patterns_found:
+  - category: control_flow
+    pattern: App-side boost actions all converge on a single executor before calling ryFine().
+    description: Single boost, compare-without/with-repo, compare-models, prompt-library boost, and adjustment iterations all normalize through executeBoostRequest().
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1104
+        snippet: executeBoostRequest(...) resolves the key, loads recent project history, calls ryFine(), streams chunks into state, and archives successful runs.
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1200
+        snippet: boost() calls executeBoostRequest with current provider/model/agent/customInstructions/repoContext.
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1414
+        snippet: adjustRefinement() reuses executeBoostRequest with prior output as promptText and merged custom instructions.
+    prevalence: common
+  - category: architecture
+    pattern: Prompt assembly is centralized in ryFine.ts and still based on hardcoded strings.
+    description: A single AGENT_SYSTEM_PROMPTS record plus buildSystemPrompt()/wrapUserMessage() determines all prompt assembly behavior before provider dispatch.
+    examples:
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:55
+        snippet: const AGENT_SYSTEM_PROMPTS: Record<Agent, string> = { ... }
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:126
+        snippet: buildSystemPrompt(agent, customInstructions, fewShotExamples)
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:152
+        snippet: wrapUserMessage(promptText, repoContext)
+    prevalence: common
+  - category: provider_dispatch
+    pattern: Provider helpers take systemPrompt plus raw prompt/repo context, then recreate the user message locally.
+    description: Anthropic, OpenAI-compatible, and Gemini helpers each call wrapUserMessage() internally; browser AI is the exception because it already takes a final userPrompt string.
+    examples:
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:185
+        snippet: const textContent = wrapUserMessage(promptText, repoContext)
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:232
+        snippet: const textContent = wrapUserMessage(promptText, repoContext)
+      - file: web/src/lib/ryFine.ts
+        location: web/src/lib/ryFine.ts:287
+        snippet: parts.push({ text: wrapUserMessage(promptText, repoContext) })
+      - file: web/src/lib/webllmProvider.ts
+        location: web/src/lib/webllmProvider.ts:154
+        snippet: boostWithBrowserAi(model, systemPrompt, userPrompt, onChunk, signal)
+    prevalence: common
+  - category: data_flow
+    pattern: Few-shot examples are assembled in App, not inside ryFine().
+    description: executeBoostRequest() pulls recent records from IndexedDB, converts them via buildFewShotExamples(), and injects them into the RyFineRequest.
+    examples:
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1124
+        snippet: const recent = await getRecentRecords(activeProjectRef.id, 3)
+      - file: web/src/App.tsx
+        location: web/src/App.tsx:1126
+        snippet: fewShotExamples = buildFewShotExamples(recent)
+      - file: web/src/lib/projects.ts
+        location: web/src/lib/projects.ts:55
+        snippet: buildFewShotExamples(records).slice(0, 3)
+    prevalence: occasional
+
+related_architecture:
+  components_relevant_to_domain:
+    - component: App request orchestration
+      responsibility: Collect active UI state and translate it into BoostRunRequest / RyFineRequest calls.
+      location: web/src/App.tsx
+      relationship_to_domain: domain feeds ryFine() from here
+    - component: Core refinement orchestrator
+      responsibility: Assemble prompts and choose the provider helper to execute.
+      location: web/src/lib/ryFine.ts
+      relationship_to_domain: primary implementation of the domain
+    - component: Browser AI provider
+      responsibility: Execute local browser-based streaming completions using separate system and user messages.
+      location: web/src/lib/webllmProvider.ts
+      relationship_to_domain: provider target used by ryFine() switch dispatch
+    - component: Project history storage
+      responsibility: Supply recent prompt history for few-shot examples.
+      location: web/src/lib/projectStorage.ts and web/src/lib/projects.ts
+      relationship_to_domain: outbound dependency used before prompt assembly
+  interfaces_used_by_domain:
+    - interface: RyFineRequest
+      location: web/src/lib/ryFine.ts:12
+      usage_pattern: Shared request contract passed from App into the refinement pipeline.
+    - interface: FewShotExample
+      location: web/src/lib/projects.ts:19
+      usage_pattern: App computes these from project history and injects them into RyFineRequest.
+    - interface: Agent
+      location: web/src/lib/agents.ts:1
+      usage_pattern: Dropdown-selected agent currently indexes AGENT_SYSTEM_PROMPTS and will map to SkillId in the plan.
+  data_flow_involving_domain: App state produces BoostRunRequest values; executeBoostRequest resolves provider credentials and optional few-shot examples; ryFine() builds a single systemPrompt and a wrapped user message; ryFine() applies provider-specific vision filtering; one provider helper performs the streaming call; chunks stream back into App result state; successful results may be archived as PromptRecord entries.
+  key_relationships_to_domain:
+    - from: web/src/App.tsx
+      to: web/src/lib/projectStorage.ts
+      relationship: calls getRecentRecords
+    - from: web/src/App.tsx
+      to: web/src/lib/projects.ts
+      relationship: calls buildFewShotExamples
+    - from: web/src/App.tsx
+      to: web/src/lib/ryFine.ts
+      relationship: calls ryFine and detectOutputType
+    - from: web/src/lib/ryFine.ts
+      to: web/src/lib/webllmProvider.ts
+      relationship: calls boostWithBrowserAi
+
+related_technology_stack:
+  languages_used_in_domain:
+    - TypeScript
+    - TSX
+  frameworks_used_in_domain:
+    - name: React
+      usage_in_domain: App.tsx owns refinement state and invokes the core pipeline from event handlers.
+  libraries_used_in_domain:
+    - name: @anthropic-ai/sdk
+      purpose_in_domain: Anthropic streaming provider client inside boostAnthropic().
+    - name: openai
+      purpose_in_domain: OpenAI-compatible streaming client for OpenAI, DeepSeek, Ollama, OpenRouter, and Groq.
+    - name: @mlc-ai/web-llm
+      purpose_in_domain: Browser-local inference behind boostWithBrowserAi().
+  external_apis_used_in_domain:
+    - name: Anthropic Messages API
+      integration_point: web/src/lib/ryFine.ts:193
+    - name: OpenAI-compatible chat completions APIs
+      integration_point: web/src/lib/ryFine.ts:237
+    - name: Gemini streamGenerateContent API
+      integration_point: web/src/lib/ryFine.ts:281
+    - name: Ollama OpenAI-compatible endpoint
+      integration_point: web/src/lib/ryFine.ts:502
+
+related_conventions:
+  naming_patterns_in_domain: Provider helpers are named boost{Provider}; pipeline entry point is ryFine(); App-side orchestration uses verb-based handlers like boost, boostBoth, boostCompareModels, and adjustRefinement.
+  structure_of_domain: App owns request shaping and UI state; lib/ryFine.ts owns prompt assembly plus provider dispatch; supporting lib files provide types and persistence; browser tests exercise the UI through a mock provider.
+  error_handling_in_domain: executeBoostRequest() translates thrown errors into BoostResult state; ryFine() itself mostly propagates provider exceptions; provider probes and Gemini parsing convert HTTP failures into detailed Error messages.
+  testing_in_domain: Current direct tests cover adjacent helpers only; full pipeline behavior is exercised indirectly through browserReport.ts with a mocked Ollama-compatible server.
+  documentation_in_domain: docs/pipeline-upgrade-plan.md defines Phases 1-4 and explicitly targets buildSystemPrompt(), wrapUserMessage(), RyFineRequest, and ryFine() for replacement.
+
+related_dependencies:
+  internal:
+    - component: web/src/lib/agents.ts
+      relationship_to_domain: supplies the current agent union that the new skill registry is intended to mirror
+      direction: outbound
+    - component: web/src/lib/projects.ts
+      relationship_to_domain: supplies FewShotExample and example truncation logic
+      direction: outbound
+    - component: web/src/lib/projectStorage.ts
+      relationship_to_domain: supplies recent history for few-shot injection before ryFine() calls
+      direction: outbound
+    - component: web/src/lib/webllmProvider.ts
+      relationship_to_domain: one provider target already using separate system/user prompt inputs
+      direction: outbound
+    - component: web/src/App.tsx
+      relationship_to_domain: caller that shapes requests and consumes streamed chunks/results
+      direction: inbound
+  external:
+    - name: @anthropic-ai/sdk
+      purpose_for_domain: hosted provider client
+    - name: openai
+      purpose_for_domain: generic OpenAI-compatible provider client
+    - name: @mlc-ai/web-llm
+      purpose_for_domain: browser-local provider engine
+
+testing_patterns:
+  framework: node:test for helper units plus a checked-in Playwright-style browser harness
+  coverage_areas:
+    - repo context formatting helpers
+    - saved prompt serialization and import helpers
+    - browser UI flows for compare mode, provider errors, and slow streaming responses via a mock Ollama-compatible endpoint
+  test_organization: unit helpers live under web/tests/*.test.ts; end-to-end browser harness logic is consolidated in web/tests/browserReport.ts
+  mock_patterns:
+    - local mock Ollama-compatible SSE server in browserReport.ts
+    - in-memory storage stub in savedPrompts.test.ts
+
+open_questions:
+  - question: Where should Phase 4 source userSkills from before the Phase 5 UI exists?
+    context: The Phase 4 plan adds request.userSkills and re-exports UserSkill from ryFine.ts, but current App request construction has no userSkills state or storage.
+  - question: Should detectOutputType() remain in ryFine.ts unchanged after the pipeline rewrite, or be considered part of the broader pipeline surface?
+    context: The plan for Phases 1-4 does not mention detectOutputType(), but it is part of the current post-provider control flow returned to App.
+
+gaps:
+  - area: direct unit coverage for prompt assembly
+    description: No existing tests exercise buildSystemPrompt(), wrapUserMessage(), or ryFine() in isolation.
+    impact: Prompt-assembly regressions from Phases 1-4 would currently be caught only by manual checks or the broader browser harness.
+  - area: exact future UI trace wiring
+    description: The report scope stops at Phases 1-4; the detailed App state for PipelineTrace rendering appears later in the plan at Phase 6 and is not implemented in the current code.
+    impact: This does not block the core pipeline research, but it means onTrace consumer points are only defined in planning docs, not in current code.

@@ -1,0 +1,21 @@
+{
+  "name": "@ryfine/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./agents": "./src/agents.ts",
+    "./providers": "./src/providers.ts",
+    "./imageUtils": "./src/imageUtils.ts",
+    "./ryFine": "./src/ryFine.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.99.0",
+    "@mlc-ai/web-llm": "^0.2.84",
+    "openai": "^6.39.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  }
+}

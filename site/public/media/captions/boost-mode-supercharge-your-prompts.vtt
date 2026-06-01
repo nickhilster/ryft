@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00.000 --> 00:20.000
+Most prompt tools stop at cleanup. RyFine can layer intent-specific structure, your custom rules, and reusable skills into the same refinement run.
+
+00:20.000 --> 00:48.000
+In the UI, boost mode is the normal RyFine flow. What makes it powerful is the context you add around the prompt.
+
+00:48.000 --> 02:15.000
+Open Rules for always-on constraints, add a custom skill for your domain, then run the same input through A/B comparison when you need to compare models side by side.
+
+02:15.000 --> 03:05.000
+Use Rules for durable constraints and Skills for reusable expertise. That keeps prompts shorter, more consistent, and easier to hand off across a team.
+
+03:05.000 --> 03:20.000
+Try RyFine now and build a refinement workflow that gets smarter with every run.

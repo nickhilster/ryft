@@ -1,0 +1,522 @@
+plan_id: pipeline-upgrade-2026-05-29
+objective: implement docs/pipeline-upgrade-plan.md end-to-end for the web app, including phases 1-6, required validation, and any necessary README/web README updates
+created_at: 2026-05-29T00:00:00Z
+created_by: GitHub Copilot GPT-5.4
+status: completed
+research_confidence: medium
+
+tldr: |
+  Replace the current hardcoded prompt builder with a client-side four-stage context assembly pipeline, then expose that pipeline through custom skills and a visible trace in the web app.
+  Execution is split so the pure TypeScript foundation lands first, core provider wiring stays isolated, App.tsx UI changes are sequenced to avoid merge collisions, and validation plus docs are completed before review.
+  Planning used the two available research findings files plus the implementation plan, package scripts, and current README surfaces; the requested validation-docs findings file was not present in docs/plan/pipeline-upgrade-2026-05-29.
+
+open_questions:
+  - Should execution proceed with the validation and documentation assumptions captured here, or do you want a replacement research findings file created first for that missing validation-docs slice?
+
+pre_mortem:
+  overall_risk_level: medium
+  critical_failure_modes:
+    - scenario: Provider helper signature changes regress streaming behavior or accidentally introduce more than one model call per refinement.
+      likelihood: medium
+      impact: critical
+      mitigation: Keep all pipeline assembly pure and upstream of provider dispatch, preserve provider-specific transport code, and require focused build plus browser-harness validation before docs are updated.
+    - scenario: App state for trace visibility or custom skills leaks across clear, compare, and iteration flows, causing stale trace chips or incorrect prompt expansion.
+      likelihood: medium
+      impact: high
+      mitigation: Sequence all App.tsx changes after the core contract is stable, add explicit reset coverage, and validate both single-result and compare-mode paths.
+    - scenario: Auto-classification and keyword-triggered user skills apply too broadly, producing lower-quality prompts or surprising users.
+      likelihood: medium
+      impact: high
+      mitigation: Add deterministic unit coverage for scoring thresholds and keyword matching, keep low-confidence fallback behavior explicit, and expose the applied-skill trace for fast debugging.
+  assumptions:
+    - The requested file docs/plan/pipeline-upgrade-2026-05-29/research_findings_validation-docs.yaml does not exist, so validation and README scope are inferred from docs/pipeline-upgrade-plan.md and the current repo scripts and READMEs.
+    - The implementation will stay inside web/ plus README.md and web/README.md, with no required site/ changes.
+    - The Browser AI provider contract already accepts separate system and user prompts and can remain behaviorally unchanged apart from the upstream assembly inputs.
+
+implementation_specification:
+  code_structure: Keep stages 1-3 as pure TypeScript modules under web/src/lib, keep stage 4 as a thin orchestration change in ryFine.ts, isolate custom-skill persistence in a dedicated localStorage helper, and add UI-only components for the skills drawer and pipeline trace while App.tsx remains the integration boundary.
+  affected_areas:
+    - web/src/lib/skills.ts
+    - web/src/lib/intentClassifier.ts
+    - web/src/lib/contextAssembler.ts
+    - web/src/lib/ryFine.ts
+    - web/src/lib/userSkills.ts
+    - web/src/components/SkillManager.tsx
+    - web/src/components/PipelineTrace.tsx
+    - web/src/App.tsx
+    - web/src/App.css
+    - web/tests/*.test.ts
+    - README.md
+    - web/README.md
+  component_details:
+    - component: skills registry
+      responsibility: Define the built-in skill catalog, detection signals, and lookup helpers that replace the current hardcoded agent prompt record.
+      interfaces:
+        - BUILT_IN_SKILLS
+        - getSkill(id)
+        - getAllSkills()
+    - component: intent classifier
+      responsibility: Score raw prompt text against built-in skill signals and return deterministic primary, secondary, signal, and confidence metadata for auto-routing.
+      interfaces:
+        - classifyIntent(promptText)
+        - isConfidentClassification(result)
+    - component: context assembler
+      responsibility: Combine built-in skills, optional user skills, custom instructions, repo context, and few-shot examples into the assembled system prompt, user message, and UI trace.
+      interfaces:
+        - assembleContext(input)
+        - PipelineTrace
+        - UserSkill
+        - AssemblyInput
+        - AssemblyOutput
+    - component: refinement runtime integration
+      responsibility: Call the classifier and assembler inside ryFine(), forward the assembled messages to existing providers, and emit trace data before streaming begins.
+      interfaces:
+        - RyFineRequest.userSkills
+        - ryFine(request, onChunk, signal, onTrace)
+    - component: custom skills management UI
+      responsibility: Let users create, edit, delete, persist, and surface reusable custom skills from a dedicated drawer.
+      interfaces:
+        - loadUserSkills()
+        - saveUserSkills(skills)
+        - SkillManager props
+    - component: pipeline trace UI
+      responsibility: Show applied skills and context chips in single-result mode and expand the assembled system prompt on demand.
+      interfaces:
+        - PipelineTraceProps
+        - App-level trace state and command-palette hooks
+  dependencies:
+    - component: intent classifier
+      relationship: Consumes the built-in skills registry signal definitions.
+    - component: context assembler
+      relationship: Consumes built-in skills, optional classification results, repo context, custom rules, and few-shot examples to build the prompt payload.
+    - component: refinement runtime integration
+      relationship: Calls the classifier and assembler, then passes assembled strings to provider helpers and Browser AI runtime.
+    - component: custom skills management UI
+      relationship: Persists UserSkill records and feeds them into App.tsx request construction.
+    - component: pipeline trace UI
+      relationship: Renders the PipelineTrace emitted by ryFine() for successful single-result runs only.
+  integration_points:
+    - executeBoostRequest in App.tsx remains the single request gateway and gains userSkills plus trace capture.
+    - ryFine.ts remains the only place where assembled prompts cross into provider-specific transports.
+    - The top command bar gains a Skills trigger and palette commands without changing existing drawer mechanics.
+    - The output pane header gains the trace strip and assembled-prompt expansion only for single-result completions.
+    - README.md and web/README.md are updated after validation to describe shipped user-visible behavior rather than planned behavior.
+
+tasks:
+  - id: task-001
+    title: Establish the built-in skills registry and intent scoring foundation
+    description: |
+      Deliver the pure TypeScript foundation for stages 1 and 2 by replacing the current hardcoded agent prompt map with a typed skills registry and deterministic intent classifier.
+      Keep this slice focused on new lib modules and compatibility with the existing Agent union so the rest of the pipeline can build on a stable contract.
+    agent: gem-implementer
+    priority: high
+    status: completed
+    dependencies: []
+    context_files:
+      - web/src/lib/agents.ts: Existing Agent union that the new SkillId should mirror.
+      - web/src/lib/ryFine.ts: Current hardcoded prompt map being replaced in later phases.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phases 1 and 2.
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 260
+    focus_area: pure TypeScript skill selection
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+    acceptance_criteria:
+      - BUILT_IN_SKILLS contains the exact eight built-in skills and compiles cleanly against the Agent union.
+      - classifyIntent returns stable primary and confidence outcomes for coding, content, data, and empty-input cases from the plan.
+      - The implementation adds no provider calls, storage behavior, or UI changes in this slice.
+    failure_modes:
+      - scenario: Skill ids drift from the existing Agent union and break downstream typing.
+        likelihood: medium
+        impact: high
+        mitigation: Reuse Agent directly for SkillId and verify with a clean TypeScript build before moving on.
+      - scenario: Regex or string signal handling over-matches unrelated prompts.
+        likelihood: medium
+        impact: medium
+        mitigation: Keep scoring deterministic and defer focused cross-domain test coverage to task-007.
+    requires_review: true
+    tech_stack:
+      - TypeScript
+      - React/Vite workspace typing
+    test_coverage: Covered by build and lint in this slice, with focused classifier tests added in task-007.
+
+  - id: task-002
+    title: Assemble structured prompt context and trace metadata
+    description: |
+      Deliver stage 3 as a pure assembly module that turns agent choice, classifier output, custom rules, repo context, few-shot examples, and user skills into one structured system prompt, one user message, and one PipelineTrace.
+      Keep ordering deterministic and expose the trace contract needed later by the UI without changing provider code yet.
+    agent: gem-implementer
+    priority: high
+    status: completed
+    dependencies:
+      - task-001
+    context_files:
+      - web/src/lib/projects.ts: Existing FewShotExample shape to preserve.
+      - web/src/lib/ryFine.ts: Current buildSystemPrompt and wrapUserMessage behavior being superseded.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phase 3.
+    estimated_effort: medium
+    estimated_files: 2
+    estimated_lines: 320
+    focus_area: deterministic prompt assembly
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+    acceptance_criteria:
+      - assembleContext produces both assembled strings and a trace with skillsApplied, userSkillsApplied, hasRepoContext, hasCustomRules, hasFewShot, and assembledSystemPrompt.
+      - Auto mode uses classifier output when confidence is sufficient and falls back to the auto skill when it is not.
+      - User messages preserve the required prompt wrapper shape and always end with the closing prompt tag.
+    failure_modes:
+      - scenario: Section ordering or fallback behavior changes between runs and makes prompt output nondeterministic.
+        likelihood: medium
+        impact: high
+        mitigation: Centralize all ordering inside contextAssembler.ts and verify deterministic examples in task-007.
+      - scenario: User skills are always applied even when keyword-gated behavior was intended.
+        likelihood: medium
+        impact: medium
+        mitigation: Implement explicit matching rules and capture them in unit tests before UI rollout.
+    requires_review: true
+    tech_stack:
+      - TypeScript
+    test_coverage: Focused assembly and trace tests are added in task-007.
+
+  - id: task-003
+    title: Route every refinement through the new pipeline without changing provider semantics
+    description: |
+      Replace the legacy buildSystemPrompt and wrapUserMessage flow inside ryFine.ts with classifier plus assembler output, extend the request shape with optional userSkills, and emit trace data before the first streamed chunk.
+      Keep the single-call provider behavior intact by only changing the inputs passed to existing provider transports.
+    agent: gem-implementer
+    priority: high
+    status: completed
+    dependencies:
+      - task-002
+    context_files:
+      - web/src/lib/ryFine.ts: Core orchestration and provider dispatch contract.
+      - web/src/lib/webllmProvider.ts: Browser AI path that already accepts separate system and user prompts.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phase 4.
+    estimated_effort: medium
+    estimated_files: 2
+    estimated_lines: 260
+    focus_area: core refinement runtime
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+      - npm --prefix web run test
+    acceptance_criteria:
+      - ryFine accepts optional userSkills and optional onTrace while preserving current behavior for callers that do not pass onTrace.
+      - onTrace fires before streaming begins and carries the assembled system prompt needed by the later UI task.
+      - No AGENT_SYSTEM_PROMPTS record or wrapUserMessage call remains in the runtime path.
+    failure_modes:
+      - scenario: Provider helpers still rebuild user messages internally and diverge from assembled output.
+        likelihood: medium
+        impact: high
+        mitigation: Change provider helper signatures in one slice and verify all call sites compile before any App wiring begins.
+      - scenario: Trace emission races with chunk streaming and produces empty or stale prompt expansion.
+        likelihood: medium
+        impact: high
+        mitigation: Emit onTrace synchronously immediately after assembly and before dispatching to the provider switch.
+    requires_review: true
+    tech_stack:
+      - TypeScript
+      - Streaming provider adapters
+    test_coverage: Add focused runtime coverage in task-007 and preserve existing browser harness coverage for end-to-end request flow.
+
+  - id: task-004
+    title: Let users create and persist reusable custom skills
+    description: |
+      Deliver the custom-skill management experience as a self-contained localStorage-backed capability with a reusable drawer component and matching styles.
+      This slice should let users create, edit, delete, and review their skills without yet changing request construction in App.tsx.
+    agent: gem-implementer
+    priority: medium
+    status: completed
+    dependencies:
+      - task-002
+    context_files:
+      - web/src/components/PromptLibrary.tsx: Existing drawer-contained CRUD pattern to mirror.
+      - web/src/App.css: Shared drawer and card styling surface.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phase 5 component behavior.
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 280
+    focus_area: custom skills management UI
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+    acceptance_criteria:
+      - Users can create, edit, and delete skills with name, domain, signals, and lens fields in a dedicated SkillManager component.
+      - Skills persist across reloads through the userSkills storage helper.
+      - Empty and editing states are present and visually consistent with existing drawer surfaces.
+    failure_modes:
+      - scenario: Invalid localStorage payloads break the panel or lose all skills.
+        likelihood: medium
+        impact: medium
+        mitigation: Keep loadUserSkills defensive and default to an empty list on parse failure.
+      - scenario: The new drawer styles clash with existing prompt library or project drawer layouts.
+        likelihood: low
+        impact: medium
+        mitigation: Reuse existing drawer primitives and constrain new CSS selectors to skill-specific classes.
+    requires_review: true
+    tech_stack:
+      - React 19
+      - TypeScript
+      - CSS
+    test_coverage: Manual CRUD coverage in task-008 plus focused storage tests in task-007.
+
+  - id: task-005
+    title: Apply custom skills on every refinement path and expose the Skills entry points
+    description: |
+      Wire custom skills into the existing App.tsx request boundary so single boost, compare, prompt-library launches, and adjustment flows all send the same userSkills payload into ryFine().
+      Add the Skills disclosure trigger and command-palette entries using the existing mutually exclusive drawer pattern.
+    agent: gem-implementer
+    priority: high
+    status: completed
+    dependencies:
+      - task-003
+      - task-004
+    context_files:
+      - web/src/App.tsx: Central request assembly, drawer state, and command palette definitions.
+      - web/src/lib/userSkills.ts: Persistence helpers introduced in task-004.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phase 5 App wiring.
+    estimated_effort: medium
+    estimated_files: 1
+    estimated_lines: 220
+    focus_area: app request wiring and drawer entry points
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+      - npm --prefix web run test
+    acceptance_criteria:
+      - The command bar shows a Skills trigger between Rules and Context with a badge count when skills exist.
+      - All App.tsx refinement entry points pass the current userSkills array into executeBoostRequest and onward into ryFine().
+      - The command palette can open the skills manager and start a new skill flow without breaking existing commands.
+    failure_modes:
+      - scenario: One of the alternate refinement paths omits userSkills and behaves inconsistently.
+        likelihood: medium
+        impact: high
+        mitigation: Update every executeBoostRequest caller in one pass and validate all paths through the browser checklist in task-008.
+      - scenario: App drawer state changes accidentally allow multiple drawers to appear or break keyboard flows.
+        likelihood: low
+        impact: medium
+        mitigation: Reuse the existing openPanel union and avoid introducing parallel drawer state.
+    requires_review: true
+    tech_stack:
+      - React 19
+      - TypeScript
+    test_coverage: Request wiring and UI entry-point coverage is added in task-007 and exercised manually in task-008.
+
+  - id: task-006
+    title: Show the applied pipeline trace and assembled prompt in single-result output
+    description: |
+      Deliver the user-visible phase 6 trace strip, prompt expansion, and reset behavior in the single-result pane while preserving the existing compare-mode branch unchanged.
+      Sequence this after the App request wiring task so App.tsx trace state and prompt expansion can be added in one controlled edit.
+    agent: gem-implementer
+    priority: medium
+    status: completed
+    dependencies:
+      - task-003
+      - task-005
+    context_files:
+      - web/src/App.tsx: Output pane rendering and reset flows.
+      - web/src/App.css: Existing pane-header, output-area, and chip styling surface.
+      - docs/pipeline-upgrade-plan.md: Source requirements for phase 6.
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 260
+    focus_area: output-pane trace UX
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+    acceptance_criteria:
+      - Successful single-result refinements show applied built-in skills, user skills, repo context, custom rules, and few-shot chips in a compact strip between the pane header and output body.
+      - Users can toggle the full assembled system prompt open and closed from both the strip button and the command palette.
+      - Trace state resets on clear and new-run flows and never appears in compare mode.
+    failure_modes:
+      - scenario: Trace expansion shows stale prompt content from a previous run.
+        likelihood: medium
+        impact: high
+        mitigation: Reset lastTrace, lastSystemPrompt, and traceExpanded in every existing transient-reset path before validating compare versus single mode.
+      - scenario: New trace styles break light-theme contrast or crowd the output header on small screens.
+        likelihood: medium
+        impact: medium
+        mitigation: Reuse existing chip tokens and include theme and responsive checks in task-008.
+    requires_review: true
+    tech_stack:
+      - React 19
+      - TypeScript
+      - CSS
+    test_coverage: UI state coverage is added in task-007 and visually verified in task-008.
+
+  - id: task-007
+    title: Add focused automated coverage for pipeline decisions and runtime contracts
+    description: |
+      Backstop the new pipeline with focused automated tests for classifier behavior, context assembly, and runtime wiring so later validation can distinguish functional regressions from manual-only UI issues.
+      Keep this slice scoped to the new pipeline surfaces instead of broad repo test expansion.
+    agent: gem-implementer
+    priority: medium
+    status: completed
+    dependencies:
+      - task-003
+      - task-005
+      - task-006
+    context_files:
+      - web/tests/repoContext.test.ts: Existing test style and node:test setup.
+      - web/tests/savedPrompts.test.ts: Existing storage and serialization test patterns.
+      - docs/pipeline-upgrade-plan.md: Acceptance examples to encode into focused tests.
+    estimated_effort: medium
+    estimated_files: 3
+    estimated_lines: 320
+    focus_area: automated regression coverage
+    verification:
+      - npm --prefix web run test
+      - npm --prefix web run build
+      - npm --prefix web run lint
+    acceptance_criteria:
+      - Focused tests cover the documented classifier examples, assembly fallbacks, user-skill keyword gating, and ryFine trace emission timing.
+      - Automated coverage remains fast enough to run as part of the main web validation loop.
+      - Existing tests continue to pass without widening unrelated failures.
+    failure_modes:
+      - scenario: Tests assert too much prompt prose and become brittle during benign wording changes.
+        likelihood: medium
+        impact: medium
+        mitigation: Assert structural markers, applied skills, and critical sections rather than every full paragraph.
+      - scenario: Runtime tests miss the provider-contract regression that matters most.
+        likelihood: low
+        impact: high
+        mitigation: Include a focused ryFine contract test for onTrace ordering and assembled message forwarding before relying on browser validation.
+    requires_review: true
+    tech_stack:
+      - TypeScript
+      - node:test
+    test_coverage: This task defines the new focused automated coverage baseline for the pipeline upgrade.
+
+  - id: task-008
+    title: Run executable validation and the shipped-user workflow checklist
+    description: |
+      Validate the upgraded web app with the required build, lint, test, and browser-report commands, then execute the manual workflow checks from the implementation plan across auto routing, custom skills, repo context, few-shot examples, and trace visibility.
+      Use this task as the release gate before README updates and review.
+    agent: gem-browser-tester
+    priority: high
+    status: completed
+    dependencies:
+      - task-007
+    context_files:
+      - web/tests/browserReport.ts: Existing browser harness and mock-provider flows.
+      - README.md: Current browser QA instructions and artifact paths.
+      - docs/pipeline-upgrade-plan.md: Required functional checklist.
+    estimated_effort: medium
+    estimated_files: 1
+    estimated_lines: 40
+    focus_area: executable validation and workflow QA
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+      - npm --prefix web run test
+      - npm --prefix web run test:browser:report
+      - npm run build
+      - npm run lint
+    acceptance_criteria:
+      - Required commands complete successfully or any environment-specific blocker is documented with exact impact.
+      - The functional checklist from the plan is exercised for auto fallback, explicit agent override, keyword-triggered skills, repo context, few-shot traces, and compare-mode exclusion.
+      - Browser-report artifacts remain current and reflect the upgraded pipeline behavior.
+    failure_modes:
+      - scenario: Browser-report prerequisites fail in the local environment and hide UI regressions.
+        likelihood: medium
+        impact: high
+        mitigation: Run command validation first, document any install/runtime blocker precisely, and capture as much of the manual checklist as possible in the same environment.
+      - scenario: Validation focuses on single-result flows and misses compare-mode regressions.
+        likelihood: medium
+        impact: high
+        mitigation: Include compare-mode exclusion and choose-and-use flow checks explicitly in the validation matrix.
+    requires_review: false
+    validation_matrix:
+      - scenario: Auto and explicit agent routing
+        steps:
+          - Start a single-result refinement with agent set to Auto using a clearly coding-oriented prompt.
+          - Repeat with a vague prompt and then with the explicit Coding agent selected.
+        expected_result: The trace shows Coding for the coding prompt, Auto for the vague low-confidence fallback, and Coding when explicitly selected regardless of prompt wording.
+      - scenario: Custom skill activation and persistence
+        steps:
+          - Create one skill without signal keywords and one skill with keywords legal and contract.
+          - Reload the app and run prompts that do and do not contain those keywords.
+        expected_result: Skills persist after reload, always-on skills appear on every refinement, and keyword-gated skills appear only when their keywords match.
+      - scenario: Trace and compare-mode behavior
+        steps:
+          - Run a single-result refinement with repo context, custom rules, and project history present, then expand and collapse the prompt view.
+          - Run compare mode and the repo-context comparison flow.
+        expected_result: Single-result mode shows the correct chips and prompt expansion, while compare mode never renders the trace strip.
+
+  - id: task-009
+    title: Update the README surfaces to describe the shipped pipeline upgrade
+    description: |
+      Refresh the root README and web README so they accurately describe the new pipeline behavior, custom skills, and trace UX once validation confirms the feature set.
+      Keep documentation user-facing and grounded in the actual shipped workflow rather than implementation-phase language.
+    agent: gem-documentation-writer
+    priority: medium
+    status: completed
+    dependencies:
+      - task-006
+      - task-008
+    context_files:
+      - README.md: Root product and development overview.
+      - web/README.md: Web-app feature and workflow documentation.
+      - docs/pipeline-upgrade-plan.md: Intended user-visible outcomes to reconcile with shipped behavior.
+    estimated_effort: small
+    estimated_files: 2
+    estimated_lines: 90
+    focus_area: user-facing documentation
+    verification:
+      - npm run build
+      - npm run lint
+    acceptance_criteria:
+      - Root README describes the new custom-skills and applied-trace capabilities at the product feature level.
+      - web/README documents the Skills drawer and pipeline trace behavior alongside existing workflows and scripts.
+      - Documentation avoids claiming behavior that was not validated in task-008.
+    failure_modes:
+      - scenario: Docs overstate the trace or custom-skill behavior and drift from the shipped UI.
+        likelihood: medium
+        impact: medium
+        mitigation: Write docs only after validation and use the validation report as the source of truth for wording.
+    requires_review: true
+    audience: end-users
+    coverage_matrix:
+      - Root product feature summary
+      - Web-app usage and settings workflow
+      - Validation and browser-report notes if user-visible expectations changed
+
+  - id: task-010
+    title: Review the upgraded pipeline for regression risk before merge
+    description: |
+      Perform a full review of the finished upgrade with emphasis on provider contract safety, App.tsx state-reset correctness, deterministic classifier behavior, and doc accuracy after validation.
+      This review is the final gate before merge or release handoff.
+    agent: gem-reviewer
+    priority: medium
+    status: completed
+    dependencies:
+      - task-008
+      - task-009
+    context_files:
+      - docs/plan/pipeline-upgrade-2026-05-29/plan.yaml: Approved execution plan and risk assumptions.
+      - web/src/lib/ryFine.ts: Highest-risk runtime contract surface.
+      - web/src/App.tsx: Highest-risk UI integration surface.
+    estimated_effort: small
+    estimated_files: 3
+    estimated_lines: 0
+    focus_area: regression and readiness review
+    verification:
+      - npm --prefix web run build
+      - npm --prefix web run lint
+      - npm --prefix web run test
+      - npm run build
+    acceptance_criteria:
+      - Review findings explicitly cover provider call semantics, trace reset behavior, keyword-gated user skills, and compare-mode exclusion.
+      - Any remaining issues are categorized by severity with concrete file-level follow-up.
+      - If no issues remain, the review records residual risks and test gaps instead of claiming zero risk.
+    failure_modes:
+      - scenario: Review focuses on style and misses the runtime contract regressions that matter.
+        likelihood: medium
+        impact: high
+        mitigation: Use a bug-risk review rubric centered on behavior, regressions, and missing validation rather than code aesthetics.
+    requires_review: true
+    review_depth: full
+    security_sensitive: false

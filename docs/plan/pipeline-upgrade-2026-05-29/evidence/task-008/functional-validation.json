@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-05-30T04:07:01.441Z",
+  "plan_id": "pipeline-upgrade-2026-05-29",
+  "task_id": "task-008",
+  "status": "success",
+  "console_errors": [],
+  "network_failures": [],
+  "scenarios": [
+    {
+      "name": "Auto agent on a coding prompt shows Coding in the trace, not Auto",
+      "status": "passed",
+      "evidence": "Trace chips: Coding",
+      "blockers": ""
+    },
+    {
+      "name": "Auto agent on a vague prompt falls back to Auto",
+      "status": "passed",
+      "evidence": "Trace chips: Auto",
+      "blockers": ""
+    },
+    {
+      "name": "Explicit coding agent shows Coding regardless of prompt content",
+      "status": "passed",
+      "evidence": "Trace chips: Coding",
+      "blockers": ""
+    },
+    {
+      "name": "User can create a skill with no signal keywords and it is applied broadly",
+      "status": "passed",
+      "evidence": "Reload preserved 2 skills; trace chips: Content, Broad guardrails",
+      "blockers": ""
+    },
+    {
+      "name": "User can create a skill with keywords legal, contract and it only applies when those words appear",
+      "status": "passed",
+      "evidence": "Non-keyword prompt omitted Legal review; keyword prompt trace chips: Auto, Broad guardrails, Legal review",
+      "blockers": ""
+    },
+    {
+      "name": "View prompt expands the assembled system prompt",
+      "status": "passed",
+      "evidence": "Expanded prompt length: 1725 chars; sections present: Additional constraints, Style reference from project history, Broad guardrails",
+      "blockers": ""
+    },
+    {
+      "name": "Repo context, custom rules, and style examples surface the expected chips when present",
+      "status": "passed",
+      "evidence": "Repo summary: 2 of 2 included 5,838 chars selected; trace chips: Auto, Broad guardrails, Repo context, Custom rules, Style examples",
+      "blockers": ""
+    },
+    {
+      "name": "Trace does not appear in compare mode",
+      "status": "passed",
+      "evidence": "Compare toolbar rendered and .pipeline-trace was absent.",
+      "blockers": ""
+    }
+  ],
+  "evidence_path": "C:\\dev\\ryfine\\docs\\plan\\pipeline-upgrade-2026-05-29\\evidence\\task-008"
+}

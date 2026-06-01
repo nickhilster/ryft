@@ -1,0 +1,16 @@
+WEBVTT
+
+00:00.000 --> 00:20.000
+If a prompt depends on your real codebase, generic wording is not enough. RyFine can bring in README files, configs, and source files so the refinement reflects your project.
+
+00:20.000 --> 00:45.000
+Open Context to upload files, scan a local Git folder, or import a GitHub repository. RyFine filters out noise and lets you choose what gets sent.
+
+00:45.000 --> 02:22.000
+Import a small set of files, preview the snippets, and include only the ones that matter. Then run the same prompt twice: once without repo context and once with it.
+
+02:22.000 --> 03:10.000
+Use this for code reviews, implementation plans, docs updates, or migration prompts that need to match the repo you are actually working in.
+
+03:10.000 --> 03:25.000
+Try RyFine now and see how much stronger your prompts get with the right context attached.
