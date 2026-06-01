@@ -138,19 +138,19 @@ const LazySkillManager = lazy(() =>
   })),
 );
 
-const LS_PROVIDER = "ryfine_provider";
-const LS_MODEL = "ryfine_model";
-const LS_AGENT = "ryfine_agent";
-const LS_CUSTOM_INSTRUCTIONS = "ryfine_custom_boost_instructions";
-const LS_KEY = (provider: Provider) => `ryfine_key_${provider}`;
-const LS_THEME = "ryfine_theme";
-const LS_COMPARE_PROVIDER = "ryfine_compare_provider";
-const LS_COMPARE_MODEL = "ryfine_compare_model";
-const LS_ACTIVE_PROJECT_ID = "ryfine_active_project_id";
-const LS_ONBOARDING_DONE = "ryfine_onboarding_done";
-const LS_GITHUB_TOKEN = "ryfine_github_token";
+const LS_PROVIDER = "ryft_provider";
+const LS_MODEL = "ryft_model";
+const LS_AGENT = "ryft_agent";
+const LS_CUSTOM_INSTRUCTIONS = "ryft_custom_boost_instructions";
+const LS_KEY = (provider: Provider) => `ryft_key_${provider}`;
+const LS_THEME = "ryft_theme";
+const LS_COMPARE_PROVIDER = "ryft_compare_provider";
+const LS_COMPARE_MODEL = "ryft_compare_model";
+const LS_ACTIVE_PROJECT_ID = "ryft_active_project_id";
+const LS_ONBOARDING_DONE = "ryft_onboarding_done";
+const LS_GITHUB_TOKEN = "ryft_github_token";
 const LEGACY_API_KEY_PREFIX = "promptboost_key_";
-const STORAGE_MIGRATION_FLAG = "ryfine_storage_migration_v1";
+const STORAGE_MIGRATION_FLAG = "ryft_storage_migration_v1";
 const GITHUB_FILE_FETCH_CONCURRENCY = 20;
 
 type AppTheme = "system" | "light" | "dark";
@@ -205,7 +205,7 @@ function migrateLegacyLocalStorage() {
     }
 
     for (const legacyKey of legacyApiKeys) {
-      const nextKey = legacyKey.replace(LEGACY_API_KEY_PREFIX, "ryfine_key_");
+      const nextKey = legacyKey.replace(LEGACY_API_KEY_PREFIX, "ryft_key_");
       const legacyValue = storage.getItem(legacyKey);
 
       if (legacyValue !== null && storage.getItem(nextKey) === null) {
@@ -2122,7 +2122,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "ryfine-prompts.json";
+    link.download = "ryft-prompts.json";
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -2396,7 +2396,7 @@ export default function App() {
   const paletteCommands: Command[] = [
     {
       id: "boost",
-      label: "RyFine — refine prompt",
+      label: "Ryft — refine prompt",
       shortcut: "⌘↵",
       action: () => void boost(),
       disabled: !canBoost,
@@ -2533,7 +2533,7 @@ export default function App() {
           if (!browserAiAvailable && !hasAnyKey) {
             return (
               <div className="onboarding-examples">
-                <p className="onboarding-label">Get started with RyFine</p>
+                <p className="onboarding-label">Get started with Ryft</p>
                 <p className="onboarding-sublabel">
                   Your browser doesn't support Browser AI (WebGPU). Choose a
                   provider to get started:
@@ -2582,7 +2582,7 @@ export default function App() {
             <div className="onboarding-examples">
               <div className="onboarding-examples-header">
                 <p className="onboarding-label">
-                  Try an example to see RyFine in action
+                  Try an example to see Ryft in action
                 </p>
                 {examplesGenerating && (
                   <span className="examples-generating-hint">personalising…</span>
@@ -2872,7 +2872,7 @@ export default function App() {
                 onClick={() => void boostBoth()}
                 disabled={!canBoost}
               >
-                RyFine both
+                Ryft both
               </button>
             )}
             <button
@@ -2882,7 +2882,7 @@ export default function App() {
               title="Ctrl+Enter"
             >
               <SeedOfLifeLogo size={18} mode={buttonMode} />
-              RyFine
+              Ryft
             </button>
           </>
         )}
@@ -2934,7 +2934,7 @@ export default function App() {
     <div className="pane pane-output">
       <div className="pane-header">
         <span className="pane-title">
-          {outputMode === "compare" ? "RyFine comparison" : "Refined prompt"}
+          {outputMode === "compare" ? "Ryft comparison" : "Refined prompt"}
         </span>
         <div className="pane-header-actions">
           {qualityScore && <QualityScore score={qualityScore} />}
@@ -3415,15 +3415,15 @@ export default function App() {
           >
             {/* Clicking the icon or wordmark opens the about page */}
             <a
-              href="https://www.ryfine.app/about"
+              href="https://ryft.dev/about"
               target="_blank"
               rel="noreferrer"
               className="logo-link"
-              aria-label="RyFine — about page"
+              aria-label="Ryft — about page"
               tabIndex={0}
             >
               <SeedOfLifeLogo size={28} mode={logoMode} />
-              <span className="logo-word">RyFine</span>
+              <span className="logo-word">Ryft</span>
             </a>
 
             {logoPopoverOpen && (
@@ -3445,12 +3445,12 @@ export default function App() {
                 </p>
                 <ul className="logo-popover-bullets">
                   <li>Refined using your own API keys</li>
-                  <li>Nothing is sent to RyFine servers</li>
+                  <li>Nothing is sent to Ryft servers</li>
                   <li>No account or sign-up required</li>
                   <li>Browser AI runs fully offline</li>
                 </ul>
                 <a
-                  href="https://www.ryfine.app/about#safety"
+                  href="https://ryft.dev/about#safety"
                   target="_blank"
                   rel="noreferrer"
                   className="logo-popover-link"
@@ -3467,7 +3467,7 @@ export default function App() {
           <button
             type="button"
             className={`disclosure-trigger ${openPanel === "rules" ? "is-open" : ""} ${rulesActive ? "has-indicator" : ""}`}
-            aria-label="RyFine Rules"
+            aria-label="Ryft Rules"
             aria-expanded={openPanel === "rules"}
             onClick={() =>
               setOpenPanel((prev) => (prev === "rules" ? null : "rules"))
@@ -3662,7 +3662,7 @@ export default function App() {
                   <p className="github-scope-warning">
                     ⚠ Connecting grants <strong>full repository access</strong>{" "}
                     (read and write) via the <code>repo</code> OAuth scope.
-                    RyFine only reads file contents — it never writes to your
+                    Ryft only reads file contents — it never writes to your
                     repositories.
                   </p>
                 )}
@@ -3697,7 +3697,7 @@ export default function App() {
                       <p className="github-hint">
                         {copiedTarget === "github-device-code"
                           ? "Code copied."
-                          : "RyFine will keep polling until you approve the device."}
+                          : "Ryft will keep polling until you approve the device."}
                       </p>
                     </div>
                   )}
@@ -3939,7 +3939,7 @@ export default function App() {
         >
           <header className="drawer-header">
             <div>
-              <h2 className="drawer-title">RyFine Rules</h2>
+              <h2 className="drawer-title">Ryft Rules</h2>
               <p className="drawer-subtitle">
                 Rules that shape every refinement — tone, structure, or
                 constraints.
@@ -3948,7 +3948,7 @@ export default function App() {
             <button
               className="drawer-close"
               type="button"
-              aria-label="Close RyFine Rules"
+              aria-label="Close Ryft Rules"
               onClick={() => setOpenPanel(null)}
             >
               ×
@@ -4178,7 +4178,7 @@ export default function App() {
                 <p className="repo-context-empty" style={{ marginTop: 12 }}>
                   {historySearch.trim()
                     ? "No history entries matched that search."
-                    : "No refinements yet for this project. Run RyFine ✦ to start building history."}
+                    : "No refinements yet for this project. Run Ryft ✦ to start building history."}
                 </p>
               )}
           </div>
@@ -4210,7 +4210,7 @@ export default function App() {
           ·
         </span>
         <a
-          href="https://www.ryfine.app/about"
+          href="https://ryft.dev/about"
           target="_blank"
           rel="noreferrer"
           className="footer-link"
