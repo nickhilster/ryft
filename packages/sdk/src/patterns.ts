@@ -14,7 +14,7 @@ export const PATTERNS: Pattern[] = [
     id: 'inj-001',
     type: 'instruction_override',
     severity: 'critical',
-    pattern: /\b(ignore|disregard|forget|override|bypass)\s+(all\s+)?(previous|prior|above|earlier|your)\s+(instructions?|rules?|constraints?|guidelines?)/i,
+    pattern: /\b(ignore|disregard|forget|override|bypass)\s+(all\s+)?(your\s+)?(previous|prior|above|earlier|your)\s+(instructions?|rules?|constraints?|guidelines?)/i,
     explanation: 'Attempts to nullify existing instructions.',
   },
   {
